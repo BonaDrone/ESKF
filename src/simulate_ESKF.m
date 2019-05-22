@@ -120,4 +120,32 @@ H_f = jacobian(h_f, x);
 X_dx = blkdiag(eye(6), Qmat(q));
 H_dx_f = H_f*X_dx;
 
+%% ESKF Simulation
+% Iterate through all rows of raw data. It is assumed here that
+% sensor data has already been collected at the desired frequencies.
+% This way, each iteration simulates the arrival of new data from
+% a specific sensor
+for i = 1 : length(data(:,1))
+    sensor = data(i,2);
+    timestamp = data(i, 1);
+    new_data = data(i, 3:end);
+
+    switch sensor
+        case 1 % IMU data, update state estimation
+            disp('IMU')
+            x, P = update();
+        case 2 % accel data, correct state
+            disp('accel')
+            x, P = accelCorrect();
+        case 3 % range data, correct state
+            disp('range')
+            x, P = rangeCorrect();
+        case 4 % flow data, correct state
+            disp('flow')
+            x, P = flowCorrect();
+        otherwise
+            disp('unknown data')
+    end
+end
+
 
