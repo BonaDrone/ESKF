@@ -1,4 +1,10 @@
 clc; clear
+%% Constants definitions to improve readability
+IMU   = 1;
+ACCEL = 2;
+RANGE = 3;
+FLOW  = 4;
+
 %% Load raw data
 % try catch structure for debugging
 try
@@ -121,6 +127,10 @@ X_dx = blkdiag(eye(6), Qmat(q));
 H_dx_f = H_f*X_dx;
 
 %% ESKF Simulation
+% Initialize state and P
+x = zeros(10, 1); x(7) = 1.0;
+P = diag(ones(1,9));
+
 % Iterate through all rows of raw data. It is assumed here that
 % sensor data has already been collected at the desired frequencies.
 % This way, each iteration simulates the arrival of new data from
@@ -131,18 +141,18 @@ for i = 1 : length(data(:,1))
     new_data = data(i, 3:end);
 
     switch sensor
-        case 1 % IMU data, update state estimation
+        case IMU % IMU data, update state estimation
             disp('IMU')
-            x, P = update();
-        case 2 % accel data, correct state
+            x; P = update();
+        case ACCEL % accel data, correct state
             disp('accel')
-            x, P = accelCorrect();
-        case 3 % range data, correct state
+            x; P = accelCorrect();
+        case RANGE % range data, correct state
             disp('range')
-            x, P = rangeCorrect();
-        case 4 % flow data, correct state
+            x; P = rangeCorrect();
+        case FLOW % flow data, correct state
             disp('flow')
-            x, P = flowCorrect();
+            x; P = flowCorrect();
         otherwise
             disp('unknown data')
     end
