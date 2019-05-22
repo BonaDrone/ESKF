@@ -22,7 +22,7 @@ function [x,P] = accelCorrect(x,P,y)
           0, 0, 0, 0, 0, 0,           - 2*g*x(7)*x(8) - 2*g*x(9)*x(10),               2*g*x(8)*x(10) - 2*g*x(7)*x(9),                     0];
 
     % compute innovation and covariance
-    z = y - h;
+    z = y(1:3) - h;
     Z = H*P*H.' + N;
     % compute gain
     K = (P*H.')/Z;
