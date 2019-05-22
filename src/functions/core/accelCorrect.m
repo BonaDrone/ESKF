@@ -10,7 +10,7 @@ function [x,P] = accelCorrect(x,inputArg2)
          -g*(2*x(7)*x(8) + 2*x(9)*x(10));
          -g*(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2)];
     
-    % Jacobian of measurement model 
+    % Jacobian of measurement model w.r.t. error states
     H = [ 0, 0, 0, 0, 0, 0,                                 0,                                   0,                     0;...
           0, 0, 0, 0, 0, 0,                                 0,                                   0,                     0;...
           0, 0, 0, 0, 0, 0,                                 0,                                   0,                     0;...
@@ -31,7 +31,7 @@ function [x,P] = accelCorrect(x,inputArg2)
     %     
     % H_dx_a = H_x*X_dx;
 
-    x = inputArg1;
+    x = x;
     P = inputArg2;
 end
 
