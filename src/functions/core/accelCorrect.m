@@ -3,7 +3,7 @@ function [x,P] = accelCorrect(x,inputArg2)
 %   Detailed explanation goes here
 
     persistent N; N = [0.7, 0, 0; 0, 0.7, 0; 0, 0, 0.7];
-    persistent g; g = 9.8665;
+    persistent g; g = 9.80665;
     
     % measurement model
     h = [ g*(2*x(7)*x(9) - 2*x(8)*x(10));
