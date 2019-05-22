@@ -1,4 +1,4 @@
-function [x,P] = accelCorrect(x,inputArg2)
+function [x,P] = accelCorrect(x,P,y)
 %ACCELCORRECT Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -21,7 +21,16 @@ function [x,P] = accelCorrect(x,inputArg2)
           0, 0, 0, 0, 0, 0, g*x(7)^2 - g*x(8)^2 - g*x(9)^2 + g*x(10)^2,                                   0, 2*g*x(7)*x(9) - 2*g*x(8)*x(10);...
           0, 0, 0, 0, 0, 0,           - 2*g*x(7)*x(8) - 2*g*x(9)*x(10),               2*g*x(8)*x(10) - 2*g*x(7)*x(9),                     0];
 
-    x = x;
-    P = inputArg2;
+    % compute innovation
+    z = y - h;
+    % compute gain
+    K = (P*H.')/Z;
+    % compute errors
+    dx = K*z;
+    % inject errors
+    x = injectErrors(x,dx);
+    % update P
+    P = (eye(9) - K*H)*P*(eye(9) - K*H).' + K*N*K.';
+      
 end
 
