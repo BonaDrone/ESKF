@@ -1,6 +1,6 @@
-function [outputArg1,outputArg2] = update(inputArg1,inputArg2)
+function [x,P] = update(inputArg1,inputArg2)
 %UPDATE Summary of this function goes here
 %   Detailed explanation goes here
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
+x = inputArg1;
+P = inputArg2;
 end
