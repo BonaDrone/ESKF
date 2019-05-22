@@ -20,16 +20,6 @@ function [x,P] = accelCorrect(x,inputArg2)
           0, 0, 0, 0, 0, 0,                                 0, - g*x(7)^2 + g*x(8)^2 + g*x(9)^2 - g*x(10)^2, 2*g*x(7)*x(8) + 2*g*x(9)*x(10);...
           0, 0, 0, 0, 0, 0, g*x(7)^2 - g*x(8)^2 - g*x(9)^2 + g*x(10)^2,                                   0, 2*g*x(7)*x(9) - 2*g*x(8)*x(10);...
           0, 0, 0, 0, 0, 0,           - 2*g*x(7)*x(8) - 2*g*x(9)*x(10),               2*g*x(8)*x(10) - 2*g*x(7)*x(9),                     0];
-    
-    % h(x) - accel. Jacobian of h(x) w.r.t the quaternion
-    
-    % R_t = transpose(fromqtoR(q));
-    % R_t_g = -R_t*gv;
-    %     
-    % H_x = blkdiag(zeros(6), jacobian(R_t_g, q));
-    % X_dx = blkdiag(eye(6), Qmat(q));
-    %     
-    % H_dx_a = H_x*X_dx;
 
     x = x;
     P = inputArg2;
