@@ -4,7 +4,7 @@ clc; clear
 try
    data = csvread("../data/raw_data.csv");
 catch
-   % do nothing
+   % do nothing, just avoid throwing an error
 end
 
 %% Define States
@@ -54,7 +54,7 @@ F_x(7:10) = leftQuaternion(q)*q_aux; % q <- q x q(ws*dt)
 %% Error-State Jacobian
 
 V  = -fromqtoR(q)*skew(as);
-R  = fromqtoR(q);
+% R  = fromqtoR(q);
 Fi = -skew(ws);
 
 A_dx = ...
@@ -78,7 +78,7 @@ H_dx_a = H_x*X_dx;
 
 R_r_i = eye(3);
 p_r_i = [0; 0; 0]; % measure distances
-%p_r_i = [rx; ry; rz]; % measure distances
+% p_r_i = [rx; ry; rz]; % measure distances
 R = fromqtoR(q);
 
 p_r_w = [0; 0; pz] + R*p_r_i;
@@ -101,7 +101,7 @@ P_x = [0 fx 0; -fy 0 0];
 Rz = [0 -1 0; 1 0 0; 0 0 1];
 Ry = [-1 0 0; 0 1 0; 0 0 -1];
 
-%R_c_i = Rz*Ry;
+% R_c_i = Rz*Ry;
 R_c_i = diag([1 -1 -1]);
 R = fromqtoR(q);
 
