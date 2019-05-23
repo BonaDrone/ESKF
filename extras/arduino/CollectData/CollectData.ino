@@ -15,11 +15,31 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <FS.h>
 
 // Drivers for the sensors
 #include <VL53L1X.h>
 #include <LSM6DSM.h>
 #include <PMW3901.h>
+
+uint32_t LOG_TIME = 10 * 1000000;
+
+// data file
+File datalog;
+uint32_t startTime;
+bool shouldLog = true;
+
+// Data collection frequencies in Hz
+//float IMU_FREQ = 500.0;
+//float ACCEL_FREQ = 100.0;
+//float RANGE_FREQ = 75.0;
+//float FLOW_FREQ = 100.0;
+
+// Update periods
+//float imuUpdatePeriod = 1/IMU_FREQ;
+//float accelUpdatePeriod = 1/ACCEL_FREQ;
+//float rangeUpdatePeriod = 1/RANGE_FREQ;
+//float flowUpdatePeriod = 1/FLOW_FREQ;
 
 // IMU setup
 // LSM6DSM data-ready interrupt pin
@@ -34,15 +54,8 @@ float ACCEL_BIAS[3] = {0.0,0.0,0.0};
 float GYRO_BIAS[3]  = {0.0,0.0,0.0};
 // IMU instance
 LSM6DSM _lsm6dsm = LSM6DSM(Ascale, Gscale, AODR, GODR, ACCEL_BIAS, GYRO_BIAS);
-// Variables to hold IMU data
-float _ax = 0;
-float _ay = 0;
-float _az = 0;
-float _gx = 0;
-float _gy = 0;
-float _gz = 0;
 
-bool imuRead(void)
+bool imuRead(float & _ax,float & _ay,float & _az,float & _gx,float & _gy,float & _gz)
 {
     if (_lsm6dsm.checkNewData()) 
     {
@@ -68,8 +81,6 @@ bool distanceAvailable(float & distance)
 // Optical flow setup
 // Use digital pin 12 for chip select and SPI1 port for comms
 PMW3901 _flowSensor = PMW3901(12, &SPI1);
-float _deltaX = 0;
-float _deltaY = 0;
 
 bool flowAvailable(float & deltaX, float & deltaY)
 {
@@ -134,9 +145,79 @@ void setup(void)
     if (!_flowSensor.begin()) {
        while (true) Serial.println("Flow unavailable");
     }
+
+    // open file to log data
+    DOSFS.begin();
+    datalog = DOSFS.open("datalog.csv", "w");
+
+    startTime = micros();
+
+    pinMode(25, OUTPUT);
+    pinMode(26, OUTPUT);
+
+    digitalWrite(26, LOW);
+
 }
 
 void loop(void)
 {
+    // Collect data
+    // Variables to hold IMU data
+    float _ax = 1000.0; // 1000 is an unlikely value to be read from any of the sensors, so it is used to indicate no data
+    float _ay = 1000.0;
+    float _az = 1000.0;
+    float _gx = 1000.0;
+    float _gy = 1000.0;
+    float _gz = 1000.0;
+    // Range data
+    float _d = 1000.0;
+    // Flow data
+    float _fx = 1000.0;
+    float _fy = 1000.0;
+
+    uint32_t currentTime = micros();
+
+    // Read sensor data
+    bool imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
+    bool rangeData = distanceAvailable(_d);
+
+    flowAvailable(_fx, _fy);
+
+
+    // Collect all the possible data
+    if (datalog && shouldLog)
+    {
+        digitalWrite(25, HIGH);
+//        Serial.println("Writing data");
+        datalog.print((float)currentTime / 1000000.0, 8);
+        datalog.print(",");
+        datalog.print(_ax, 8);
+        datalog.print(",");
+        datalog.print(_ay, 8);
+        datalog.print(",");
+        datalog.print(_az, 8);
+        datalog.print(",");
+        datalog.print(_gx, 8);
+        datalog.print(",");
+        datalog.print(_gy, 8);
+        datalog.print(",");
+        datalog.print(_gz, 8);
+        datalog.print(",");
+        datalog.print(_d, 8);
+        datalog.print(",");
+        datalog.print(_fx, 8);
+        datalog.print(",");
+        datalog.println(_fy, 8);
+
+        if (currentTime - startTime > LOG_TIME) shouldLog = false;
+
+    }
+    else
+    {
+//        Serial.println("Not writing data");
+        digitalWrite(26, HIGH);
+        digitalWrite(25, LOW);
+        if (datalog) datalog.close();
+    }
 
 }
