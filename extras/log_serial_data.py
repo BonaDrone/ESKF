@@ -24,7 +24,7 @@ def main(port=PORT, baudrate=BAUDRATE, duration=LOG_DURATION):
 			# print to terminal so that one can see what's being stored
 			print raw_data 
 			# Store data in the specified file
-			if len(raw_data) == 1 and sum([i.count(".") for i in raw_data]) == 1: #and float(raw_data[2]) > 1.0:
+			if len(raw_data) == 11 and sum([i.count(".") for i in raw_data]) == 10:
 				f.write(",".join(raw_data) + "\n")
 
 	serial_com.close()
