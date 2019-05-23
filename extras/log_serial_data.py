@@ -9,7 +9,7 @@ import time
 # Serial parameters
 PORT = '/dev/ttyACM0'
 BAUDRATE = 115200
-LOG_DURATION = 120
+LOG_DURATION = 10
 
 
 def main(port=PORT, baudrate=BAUDRATE, duration=LOG_DURATION):
@@ -24,7 +24,7 @@ def main(port=PORT, baudrate=BAUDRATE, duration=LOG_DURATION):
 			# print to terminal so that one can see what's being stored
 			print raw_data 
 			# Store data in the specified file
-			if len(raw_data) == 11 and sum([i.count(".") for i in raw_data]) == 10:
+			if len(raw_data) == 10 and sum([i.count(".") for i in raw_data]) == 10:
 				f.write(",".join(raw_data) + "\n")
 
 	serial_com.close()
