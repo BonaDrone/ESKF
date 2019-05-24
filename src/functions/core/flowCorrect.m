@@ -13,8 +13,6 @@ function [x,P] = flowCorrect(x,P,y)
  
     % compute innovation and covariance
     z = y(8:9) - h;
-    size(H)
-    size(P)
     Z = H*P*H.' + N;
     % compute gain
     K = (P*H.')/Z;
