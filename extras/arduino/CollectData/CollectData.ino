@@ -1,16 +1,21 @@
 /*
-   CollectData.ino : 
+   CollectData.ino : Script to collect data from the sensors present in 
+   BonaDrone's FC and used to estimate the drone's status. It currently
+   collects data from the IMU, the Rangefinder and the Optical Flow.
+
+   This script runs, on BonaDrone's FC, at about 172Hz.
 
    Additional libraries needed:
 
-       https://github.com/simondlevy/LSM6DSM
-       https://github.com/simondlevy/VL53L1X
+       https://github.com/BonaDrone/LSM6DSM
+       https://github.com/BonaDrone/VL53L1X
+       https://github.com/BonaDrone/PMW3901
 
    Hardware support for Bonadrone flight controller:
 
-       https://github.com/simondlevy/grumpyoldpizza
+       https://github.com/BonaDrone/grumpyoldpizza
 
-   Copyright (c) 2018 Juan Gallostra
+   Copyright (c) 2019 Juan Gallostra
  */
 
 #include <Arduino.h>

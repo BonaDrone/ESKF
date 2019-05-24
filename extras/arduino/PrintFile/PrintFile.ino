@@ -1,10 +1,16 @@
-/* DOSFS read/write
- *
- * This example shows how to read and write data to and from a DOSFS file
- *
- * Code adopted from the SD Library
- *    
- * This example code is in the public domain.
+/*
+   PrintFile.ino : Script that sends via serial the contents of
+   the file datalog.csv stored in BonaDrone's FC Flash.
+
+   For the script used to collect data see: 
+
+   	   https://github.com/BonaDrone/ESKF/blob/master/extras/arduino/CollectData/CollectData.ino
+
+   Hardware support for Bonadrone flight controller:
+
+       https://github.com/BonaDrone/grumpyoldpizza
+
+   Copyright (c) 2019 Juan Gallostra
  */
 
 #include <FS.h>
