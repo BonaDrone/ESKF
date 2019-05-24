@@ -1,10 +1,5 @@
 clc; clear
-%% Constants definitions to improve readability
-IMU   = 1;
-ACCEL = 2;
-RANGE = 3;
-FLOW  = 4;
-
+format long;
 %% Load raw data
 % try catch structure for debugging
 try
@@ -12,41 +7,6 @@ try
 catch
    % do nothing, just avoid throwing an error
 end
-
-%% Define States
-syms px py pz
-syms vx vy vz
-syms qw qx qy qz
-
-syms dpx dpy dpz
-syms dvx dvy dvz
-syms dwx dwy dwz
-
-syms g dt
-
-% Nominal states
-p  = [px; py; pz];
-v  = [vx; vy; vz];
-qv = [qx; qy; qz];
-q  = [qw; qv];
-
-x = [p; v; q;];
-
-gv = [0;0;-g];
-
-% Error states
-dp  = [dpx; dpy; dpz];
-dv  = [dvx; dvy; dvz];
-dw  = [dwx; dwy; dwz];
-
-dx = [dp; dv; dw];
-
-% Measurements - IMU
-syms asx asy asz
-syms wsx wsy wsz
-
-as = [asx; asy; asz];
-ws = [wsx; wsy; wsz];
 
 %% ESKF Simulation
 % Initialize state and P
@@ -58,26 +18,31 @@ P = diag(ones(1,9));
 % This way, each iteration simulates the arrival of new data from
 % a specific sensor
 for i = 1 : length(data(:,1))
-    sensor = data(i,2);
     timestamp = data(i, 1);
-    new_data = data(i, 3:end);
+    sensor_data = data(i, 2:end);
+    
+    IMUData = sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0; 
+    accelData = sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0; 
+    rangeData = sensor_data(7) ~= 1000.0; 
+    flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0; 
 
-    switch sensor
-        case IMU % IMU data, update state estimation
-            disp('IMU')
-            x; P = update();
-        case ACCEL % accel data, correct state
-            disp('accel')
-            x; P = accelCorrect();
-        case RANGE % range data, correct state
-            disp('range')
-            x; P = rangeCorrect();
-        case FLOW % flow data, correct state
-            disp('flow')
-            x; P = flowCorrect();
-        otherwise
-            disp('unknown data')
+    if (IMUData)
+        disp("IMU Data");
+        %x; P = update(x,P,sensor_data);
     end
+    if (accelData)
+        disp("Accel Data");
+        %x; P = accelCorrect(x,P,sensor_data);
+    end
+    if (rangeData)
+        disp("Range Data");
+        %x; P = rangeCorrect(x,P,sensor_data);
+    end
+    if (flowData)
+        disp("Flow Data");
+        %x; P = flowCorrect(x,P,sensor_data);
+    end
+
 end
 
 
