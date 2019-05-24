@@ -17,7 +17,7 @@ P = diag(ones(1,9));
 % sensor data has already been collected at the desired frequencies.
 % This way, each iteration simulates the arrival of new data from
 % a specific sensor
-for i = 1 : length(data(:,1))
+for i = 2 : length(data(:,1))
     timestamp = data(i, 1);
     sensor_data = data(i, 2:end);
     
@@ -27,21 +27,23 @@ for i = 1 : length(data(:,1))
     rangeData = sensor_data(7) ~= 1000.0; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0; 
 
+    dt = timestamp - data(i-1,1);
+    
     if (IMUData)
-        disp("IMU Data");
-        %x; P = update(x, P, sensor_data, dt);
+        %disp("IMU Data");
+        [x, P] = updateState(x, P, sensor_data, dt);
     end
     if (accelData)
-        disp("Accel Data");
-        %x; P = accelCorrect(x, P, sensor_data);
+        %disp("Accel Data");
+        [x, P] = accelCorrect(x, P, sensor_data);
     end
     if (rangeData)
-        disp("Range Data");
-        %x; P = rangeCorrect(x, P, sensor_data);
+        %disp("Range Data");
+        [x, P] = rangeCorrect(x, P, sensor_data);
     end
     if (flowData)
-        disp("Flow Data");
-        %x; P = flowCorrect(x, P, sensor_data);
+        %disp("Flow Data");
+        [x, P] = flowCorrect(x, P, sensor_data);
     end
 
 end
