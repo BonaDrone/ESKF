@@ -8,8 +8,8 @@ import time
 
 # Serial parameters
 PORT = '/dev/ttyACM0'
-BAUDRATE = 115200
-LOG_DURATION = 10
+BAUDRATE = 9600
+LOG_DURATION = 10000
 
 
 def main(port=PORT, baudrate=BAUDRATE, duration=LOG_DURATION):
@@ -18,7 +18,7 @@ def main(port=PORT, baudrate=BAUDRATE, duration=LOG_DURATION):
 	intial_time = time.time()
 
 	with open("dataset.csv", "w") as f:
-		while time.time() - intial_time < duration:	
+		while time.time() - intial_time < duration:
         	# read serial data and get the different values received
 			raw_data = serial_com.readline().rstrip().split(",")
 			# print to terminal so that one can see what's being stored
