@@ -1,31 +1,23 @@
-function [x,P] = update(inputArg1,inputArg2)
+function [x,P] = update(x,P,y)
 %UPDATE Summary of this function goes here
 %   Detailed explanation goes here
 
     persistent Q;
 
     %% Integration model
-    F_x = x;
-    R = fromqtoR(q);
-    aux    = R*as + [0;0;-g];
-    q_aux  = [1; ws*dt/2];
-    F_x(1:3)   = p + v*dt;    % p <- p + v*dt
-    F_x(4:6)   = v + aux*dt;  % v <- v + (R*as+g)*dt
-    F_x(7:10) = leftQuaternion(q)*q_aux; % q <- q x q(ws*dt)
-    
+    x(1) = x(1) + dt*x(4);
+    x(2) = x(2) + dt*x(5);
+    x(3) = x(3) + dt*x(6);
+    x(4) = x(4) - dt*(( - y(1))*(x(7)^2 + x(8)^2 - x(9)^2 - x(10)^2) - ( - y(2))*(2*x(7)*x(10) - 2*x(8)*x(9)) + ( - y(3))*(2*x(7)*x(9) + 2*x(8)*x(10)));
+    x(5) = x(5) - dt*(( - y(2))*(x(7)^2 - x(8)^2 + x(9)^2 - x(10)^2) + ( - y(1))*(2*x(7)*x(10) + 2*x(8)*x(9)) - ( - y(3))*(2*x(7)*x(8) - 2*x(9)*x(10)));
+    x(6) = x(6) - dt*(g + ( - y(3))*(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2) - ( - y(1))*(2*x(7)*x(9) - 2*x(8)*x(10)) + ( - y(2))*(2*x(7)*x(8) + 2*x(9)*x(10)));
+    x(7) = x(7) + (dt*x(8)*( - y(4)))/2 + (dt*x(9)*( - y(5)))/2 + (dt*x(10)*( - y(6)))/2;
+    x(8) = x(8) - (dt*x(7)*( - y(4)))/2 - (dt*x(9)*( - y(6)))/2 + (dt*x(10)*( - y(5)))/2;
+    x(9) = x(9) - (dt*x(7)*( - y(5)))/2 + (dt*x(8)*( - y(6)))/2 - (dt*x(10)*( - y(4)))/2;
+    x(10) = x(10) - (dt*x(7)*( - y(6)))/2 - (dt*x(8)*( - y(5)))/2 + (dt*x(9)*( - y(4)))/2;
+     
     %% Error-State Jacobian
     
-    V  = -fromqtoR(q)*skew(as);
-    % R  = fromqtoR(q);
-    Fi = -skew(ws);
     
-    A_dx = ...
-        [zeros(3) eye(3)   zeros(3); ...
-        zeros(3)  zeros(3) V       ; ...
-        zeros(3)  zeros(3) Fi      ];
     
-    F_dx = eye(9) + A_dx*dt;
-    
-    x = inputArg1;
-    P = inputArg2;
 end
