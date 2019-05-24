@@ -21,6 +21,7 @@ for i = 1 : length(data(:,1))
     timestamp = data(i, 1);
     sensor_data = data(i, 2:end);
     
+    % We can know if sensor data is available via the index and the value
     IMUData = sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0; 
     accelData = sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0; 
     rangeData = sensor_data(7) ~= 1000.0; 
@@ -28,19 +29,19 @@ for i = 1 : length(data(:,1))
 
     if (IMUData)
         disp("IMU Data");
-        %x; P = update(x,P,sensor_data);
+        %x; P = update(x, P, sensor_data, dt);
     end
     if (accelData)
         disp("Accel Data");
-        %x; P = accelCorrect(x,P,sensor_data);
+        %x; P = accelCorrect(x, P, sensor_data);
     end
     if (rangeData)
         disp("Range Data");
-        %x; P = rangeCorrect(x,P,sensor_data);
+        %x; P = rangeCorrect(x, P, sensor_data);
     end
     if (flowData)
         disp("Flow Data");
-        %x; P = flowCorrect(x,P,sensor_data);
+        %x; P = flowCorrect(x, P, sensor_data);
     end
 
 end
