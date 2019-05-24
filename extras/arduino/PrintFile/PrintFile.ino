@@ -32,6 +32,7 @@ void setup(void)
 		while (myFile.available())
 		{
 			Serial.write(myFile.read());
+			delay(5);
 		}
 
 		myFile.close();
