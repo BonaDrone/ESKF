@@ -19,12 +19,10 @@ void setup(void)
 	DOSFS.begin();
 	
 	delay(5000);
-	
+
 	myFile = DOSFS.open("datalog.csv", "r");
 	if (myFile)
 	{
-		Serial.println("Reading from datalog.csv... ");
-
 		while (myFile.available())
 		{
 			Serial.write(myFile.read());
@@ -37,7 +35,6 @@ void setup(void)
 		Serial.println("Error opening datalog.csv");
 	}
 
-	Serial.println("Done");
 }
 
 void loop(void)
