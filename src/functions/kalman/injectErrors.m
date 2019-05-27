@@ -13,10 +13,7 @@ function [x] = injectErrors(x,dx)
     % Inject orientation error
     tmp = [1; dx(7)/2; dx(8)/2; dx(9)/2];
     
-    qL = [ x(7)  -x(8)  -x(9)  -x(10);...
-           x(8)   x(7)  -x(10)  x(9);...
-           x(9)   x(10)  x(7)  -x(8);...
-           x(10) -x(9)   x(8)   x(7)];
+    qL = leftQuaternion([x(7), x(8), x(9), x(10)]);
 
     tmp2 = (qL * tmp)/norm(qL * tmp);             
           
