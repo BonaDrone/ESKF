@@ -13,6 +13,8 @@ end
 x = zeros(10, 1); x(7) = 1.0;
 P = diag(ones(1,9));
 
+X = [];
+
 % Iterate through all rows of raw data. It is assumed here that
 % sensor data has already been collected at the desired frequencies.
 % This way, each iteration simulates the arrival of new data from
@@ -45,7 +47,42 @@ for i = 2 : length(data(:,1))
         %disp("Flow Data");
         [x, P] = flowCorrect(x, P, sensor_data);
     end
+    
+    X = [X, x];
 
 end
+
+%% Plot state evolution
+
+figure;
+% plot position estimation
+%subplot(4,1,1);
+hold on;
+grid on;
+plot(data(2:end,1), X(1,:)', 'b');
+plot(data(2:end,1), X(2,:)', 'r');
+plot(data(2:end,1), X(3,:)', 'g');
+title('Positions')
+
+figure;
+% plot velocity estimation
+%subplot(4,1,1);
+hold on;
+grid on;
+plot(data(2:end,1), X(4,:)', 'b');
+plot(data(2:end,1), X(5,:)', 'r');
+plot(data(2:end,1), X(6,:)', 'g');
+title('Velocities')
+
+figure;
+% plot quaternion estimation
+%subplot(4,1,1);
+hold on;
+grid on;
+plot(data(2:end,1), X(7,:)', 'k');
+plot(data(2:end,1), X(8,:)', 'b');
+plot(data(2:end,1), X(9,:)', 'r');
+plot(data(2:end,1), X(10,:)', 'g');
+title('Quaternion')
 
 
