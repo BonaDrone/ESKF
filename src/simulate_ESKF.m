@@ -29,6 +29,10 @@ for i = 2 : length(data(:,1))
     rangeData = sensor_data(7) ~= 1000.0; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0; 
 
+    sensor_data(1) = sensor_data(1) * 9.80665;
+    sensor_data(2) = sensor_data(2) * 9.80665;
+    sensor_data(3) = sensor_data(3) * 9.80665;
+    
     dt = timestamp - data(i-1,1);
     
     if (IMUData)

@@ -1,8 +1,8 @@
 function [x,P] = flowCorrect(x,P,y)
 %FLOWCORRECT Summary of this function goes here
 %   Detailed explanation goes here
-
-    persistent N fx fy; fx = 350; fy = 350; N = [1.0, 0; 0, 1.0];
+    persistent n; n = 1.0;
+    persistent N fx fy; fx = 350; fy = 350; N = [n, 0; 0, n];
 
     % measurement model
     h = [ (fx*(x(4)*(x(7)^2 + x(8)^2 - x(9)^2 - x(10)^2) + x(5)*(2*x(7)*x(10) + 2*x(8)*x(9)) - x(6)*(2*x(7)*x(9) - 2*x(8)*x(10)))*(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2))/x(3) - fx*( - y(5));...

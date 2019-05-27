@@ -1,8 +1,8 @@
 function [x,P] = accelCorrect(x,P,y)
 %ACCELCORRECT Summary of this function goes here
 %   Detailed explanation goes here
-
-    persistent N; N = [0.7, 0, 0; 0, 0.7, 0; 0, 0, 0.7];
+    persistent n; n = 0.7;
+    persistent N; N = [n, 0, 0; 0, n, 0; 0, 0, n];
     persistent g; g = 9.80665;
     
     % measurement model

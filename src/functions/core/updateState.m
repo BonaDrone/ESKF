@@ -2,7 +2,10 @@ function [x, P] = updateState(x, P, y, dt)
 %UPDATE Summary of this function goes here
 %   Detailed explanation goes here
     persistent g; g = 9.80665;
+    
     persistent Q; Q = diag(ones(1,9)); % Adjust Q
+    % Q(1,1) = 0; Q(2,2) = 0; Q(3,3) = 0;
+    
     persistent Fi; Fi = [zeros(3,9);...
                          eye(3) zeros(3,6);...
                          zeros(3,3) eye(3) zeros(3,3);...
