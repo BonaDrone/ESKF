@@ -17,6 +17,7 @@ plot(data(:,1), data(:,2), 'b');
 plot(data(:,1), data(:,3), 'r');
 plot(data(:,1), data(:,4), 'g');
 title('accelerations')  
+ylim([-0.2 1.2])
 
 subplot(4,1,2);
 grid on;
