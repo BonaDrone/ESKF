@@ -76,6 +76,23 @@ plot(data(2:end,1), X(6,:)', 'g');
 title('Velocities')
 
 figure;
+% plot velocities estimation in imu frame
+quats = X(7:10,:);
+vels = [];
+for i = 1 : length(quats(1,:))
+    quats(:, i)
+    R = q2R(quats(:, i));
+    vels = [vels, R*[X(4,i); X(5,i);X(6,i)]];
+end
+hold on;
+grid on;
+plot(data(2:end,1), vels(1,:)', 'b');
+plot(data(2:end,1), vels(2,:)', 'r');
+plot(data(2:end,1), vels(3,:)', 'g');
+title('Local velocities')
+
+
+figure;
 % plot quaternion estimation
 hold on;
 grid on;
