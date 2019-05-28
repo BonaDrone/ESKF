@@ -2,7 +2,7 @@ function [x,P] = rangeCorrect(x,P,y)
 %RANGECORRECT Summary of this function goes here
 %   Detailed explanation goes here
 
-    persistent N; N = 0.5;
+    persistent N; N = 0.01;
     
     % measurement model
     h = x(3)/(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2);
