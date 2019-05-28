@@ -11,7 +11,8 @@ end
 %% ESKF Simulation
 % Initialize state and P
 x = zeros(10, 1); x(7) = 1.0; x(3) = 0.7;
-P = zeros(9,9); %diag(ones(1,9));
+P = zeros(9,9);
+%P = diag(ones(1,9));
 
 X = [];
 
@@ -19,28 +20,30 @@ X = [];
 % sensor data has already been collected at the desired frequencies.
 % This way, each iteration simulates the arrival of new data from
 % a specific sensor
+previousTimestamp = 1;
+
 for i = 2 : length(data(:,1))
     timestamp = data(i, 1);
     sensor_data = data(i, 2:end);
     
     % We can know if sensor data is available via the index and the value
-    IMUData = sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0; 
-    accelData = sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0; 
+    IMUData = (sensor_data(1) ~= 1000.0) && (sensor_data(2) ~= 1000.0) && (sensor_data(3) ~= 1000.0) && (sensor_data(4) ~= 1000.0) && (sensor_data(5) ~= 1000.0) && (sensor_data(6) ~= 1000.0); 
+    accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
     rangeData = sensor_data(7) ~= 1000.0; 
-    flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0; 
+    flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0;
 
     sensor_data(1) = sensor_data(1) * 9.80665;
     sensor_data(2) = sensor_data(2) * 9.80665;
     sensor_data(3) = sensor_data(3) * 9.80665;
     
-    dt = timestamp - data(i-1,1);
-    
     if (IMUData)
+        dt = timestamp - data(previousTimestamp,1);
         [x, P] = updateState(x, P, sensor_data, dt);
+        previousTimestamp = i;
     end
-%    if (accelData)
-%        [x, P] = accelCorrect(x, P, sensor_data);
-%    end
+    if (accelData)
+        [x, P] = accelCorrect(x, P, sensor_data);
+    end
     if (rangeData)
         [x, P] = rangeCorrect(x, P, sensor_data);
     end
