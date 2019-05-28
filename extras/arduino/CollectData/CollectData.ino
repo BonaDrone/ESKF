@@ -27,7 +27,7 @@
 #include <LSM6DSM.h>
 #include <PMW3901.h>
 
-uint32_t LOG_TIME = 10 * 1000000;
+uint32_t LOG_TIME = 40 * 1000000;
 
 // data file
 File datalog;
@@ -193,7 +193,6 @@ void loop(void)
     if (datalog && shouldLog)
     {
         digitalWrite(25, HIGH);
-//        Serial.println("Writing data");
         datalog.print((float)currentTime / 1000000.0, 8);
         datalog.print(",");
         datalog.print(_ax, 8);
@@ -219,7 +218,6 @@ void loop(void)
     }
     else
     {
-//        Serial.println("Not writing data");
         digitalWrite(26, HIGH);
         digitalWrite(25, LOW);
         if (datalog) datalog.close();
