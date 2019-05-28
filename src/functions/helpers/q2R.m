@@ -36,7 +36,11 @@
 
 function [R,J_R]=q2R(q)
 
-[a,b,c,d] = split(q);
+%[a,b,c,d] = split(q);
+a = q(1);
+b = q(2);
+c = q(3);
+d = q(4);
 
 aa = a^2;
 ab = 2*a*b;
