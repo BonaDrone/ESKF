@@ -5,7 +5,7 @@ function [x, P] = updateState(x, P, y, dt)
     
     persistent Q; Q = zeros(9,9); % Adjust Q
     Q(1,1) = 0; Q(2,2) = 0; Q(3,3) = 0;
-    Q(4,4) = 0.5; Q(5,5) = 0.5; Q(6,6) =0.5;
+    Q(4,4) = 0.5; Q(5,5) = 0.5; Q(6,6) = 0.5;
     Q(7,7) = 0.005; Q(8,8) = 0.005; Q(9,9) = 0.005;
     
     persistent Fi; Fi = [zeros(3,9);...
