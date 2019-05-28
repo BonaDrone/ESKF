@@ -10,8 +10,8 @@ end
 
 %% ESKF Simulation
 % Initialize state and P
-x = zeros(10, 1); x(7) = 1.0;
-P = diag(ones(1,9));
+x = zeros(10, 1); x(7) = 1.0; x(3) = 0.7;
+P = zeros(9,9); %diag(ones(1,9));
 
 X = [];
 
@@ -36,23 +36,19 @@ for i = 2 : length(data(:,1))
     dt = timestamp - data(i-1,1);
     
     if (IMUData)
-        %disp("IMU Data");
         [x, P] = updateState(x, P, sensor_data, dt);
     end
-    if (accelData)
-        %disp("Accel Data");
-        [x, P] = accelCorrect(x, P, sensor_data);
-    end
+%    if (accelData)
+%        [x, P] = accelCorrect(x, P, sensor_data);
+%    end
     if (rangeData)
-        %disp("Range Data");
         [x, P] = rangeCorrect(x, P, sensor_data);
     end
     if (flowData)
-        %disp("Flow Data");
         [x, P] = flowCorrect(x, P, sensor_data);
     end
     
-    X = [X, x];
+    X = [X, x]; % Log state after estimations
 
 end
 
@@ -60,7 +56,6 @@ end
 
 figure;
 % plot position estimation
-%subplot(4,1,1);
 hold on;
 grid on;
 plot(data(2:end,1), X(1,:)', 'b');
@@ -70,7 +65,6 @@ title('Positions')
 
 figure;
 % plot velocity estimation
-%subplot(4,1,1);
 hold on;
 grid on;
 plot(data(2:end,1), X(4,:)', 'b');
@@ -80,7 +74,6 @@ title('Velocities')
 
 figure;
 % plot quaternion estimation
-%subplot(4,1,1);
 hold on;
 grid on;
 plot(data(2:end,1), X(7,:)', 'k');
@@ -89,4 +82,18 @@ plot(data(2:end,1), X(9,:)', 'r');
 plot(data(2:end,1), X(10,:)', 'g');
 title('Quaternion')
 
+figure;
+% plot euler angles' estimation
+quats = X(7:10,:);
+E = [];
+for i = 1 : length(quats(1,:))
+    e = q2e(quats(:, i));
+    E = [E, e];
+end
+hold on;
+grid on;
+plot(data(2:end,1), E(1,:)', 'b');
+plot(data(2:end,1), E(2,:)', 'r');
+plot(data(2:end,1), E(3,:)', 'g');
+title('Euler angles')
 
