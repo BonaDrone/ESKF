@@ -27,7 +27,7 @@
 #include <LSM6DSM.h>
 #include <PMW3901.h>
 
-uint32_t LOG_TIME = 40 * 1000000;
+uint32_t LOG_TIME = 120 * 1000000;
 
 // data file
 File datalog;
