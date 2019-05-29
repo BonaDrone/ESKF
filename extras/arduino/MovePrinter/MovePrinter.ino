@@ -78,6 +78,8 @@ void setup()
   // Serial.println("X homed");
   // z_homeAxis();
   // Serial.println("Z homed");
+
+  delay(5000);
   
 }
 
@@ -215,9 +217,9 @@ void xz_doUpCycle(void)
 {
   float vel = 20;
   xAxis.moveTo(xGear*-241);
-  xAxis.setSpeed(xGear*vel*2);
+  xAxis.setSpeed(xGear*vel);
 
-  zAxis.moveTo(zGear*-120);
+  zAxis.moveTo(zGear*-240);
   zAxis.setSpeed(zGear*vel);
   
   while ((xAxis.currentPosition() != xAxis.targetPosition()) && (zAxis.currentPosition() != zAxis.targetPosition()))
@@ -235,9 +237,9 @@ void xz_doDownCycle(void)
 {
   float vel = 20;
   xAxis.moveTo(xGear*-1);
-  xAxis.setSpeed(xGear*vel*2);
+  xAxis.setSpeed(xGear*vel);
 
-  zAxis.moveTo(zGear*120);
+  zAxis.moveTo(zGear*240);
   zAxis.setSpeed(zGear*vel);
   
   while ((xAxis.currentPosition() != xAxis.targetPosition()) && (zAxis.currentPosition() != zAxis.targetPosition()))
