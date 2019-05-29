@@ -36,6 +36,10 @@ for i = 2 : length(data(:,1))
     sensor_data(2) = sensor_data(2) * 9.80665;
     sensor_data(3) = sensor_data(3) * 9.80665;
     
+    sensor_data(4) = sensor_data(4) * pi / 180;
+    sensor_data(5) = sensor_data(5) * pi / 180;
+    sensor_data(6) = sensor_data(6) * pi / 180;
+    
     if (IMUData)
         dt = timestamp - data(previousTimestamp,1);
         [x, P] = updateState(x, P, sensor_data, dt);
