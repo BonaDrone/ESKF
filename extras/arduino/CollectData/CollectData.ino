@@ -27,7 +27,7 @@
 #include <LSM6DSM.h>
 #include <PMW3901.h>
 
-uint32_t LOG_TIME = 120 * 1000000;
+uint32_t LOG_TIME = 70 * 1000000;
 
 // data file
 File datalog;
@@ -46,14 +46,23 @@ bool shouldLog = true;
 //float rangeUpdatePeriod = 1/RANGE_FREQ;
 //float flowUpdatePeriod = 1/FLOW_FREQ;
 
+uint8_t flowCounter;
+uint8_t FLOW_ITERS = 3; // Read flow each 4 main loop iterations
+
 // IMU setup
 // LSM6DSM data-ready interrupt pin
 const uint8_t LSM6DSM_INTERRUPT_PIN = 2;
-// LSM6DSM full-scale settings
+// LSM6DSM settings. Options are:
+/*
+    Ascale_t: AFS_2G, AFS_16G, AFS_4G, AFS_8G
+    Gscale_t: GFS_245DPS, GFS_500DPS, GFS_1000DPS, GFS_2000DPS
+    Rate_t: ODR_12_5Hz, ODR_26Hz, ODR_52Hz, ODR_104Hz, ODR_208Hz, ODR_416Hz, ODR_833Hz, ODR_1660Hz, ODR_3330Hz, ODR_6660Hz
+
+*/
 static const LSM6DSM::Ascale_t Ascale = LSM6DSM::AFS_4G;
 static const LSM6DSM::Gscale_t Gscale = LSM6DSM::GFS_2000DPS;
-static const LSM6DSM::Rate_t   AODR   = LSM6DSM::ODR_833Hz;
-static const LSM6DSM::Rate_t   GODR   = LSM6DSM::ODR_833Hz;
+static const LSM6DSM::Rate_t   AODR   = LSM6DSM::ODR_416Hz;
+static const LSM6DSM::Rate_t   GODR   = LSM6DSM::ODR_416Hz;
 // Gyro bias will be estimated by the ESKF filter
 float ACCEL_BIAS[3] = {0.0,0.0,0.0};
 float GYRO_BIAS[3]  = {0.0,0.0,0.0};
@@ -151,6 +160,8 @@ void setup(void)
        while (true) Serial.println("Flow unavailable");
     }
 
+    flowCounter = 0;
+
     // open file to log data
     DOSFS.begin();
     datalog = DOSFS.open("datalog.csv", "w");
@@ -186,9 +197,13 @@ void loop(void)
     bool imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
     bool rangeData = distanceAvailable(_d);
 
-    flowAvailable(_fx, _fy);
-
-
+    if (flowCounter == FLOW_ITERS)
+    {
+        flowAvailable(_fx, _fy);
+        flowCounter = 0;
+    } else {
+        flowCounter += 1;
+    }
     // Collect all the possible data
     if (datalog && shouldLog)
     {
