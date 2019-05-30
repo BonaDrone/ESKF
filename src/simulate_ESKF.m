@@ -3,14 +3,26 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data.csv");
+   data = csvread("../data/raw_data_5.csv");
 catch
    % do nothing, just avoid throwing an error
 end
 
+% overwrite flow data
+for i = 2447:5255
+    if data(i,9) ~= 1000.0
+        data(i,9) = 1;
+    end
+end
+for i = 5943:7598
+    if data(i,9) ~= 1000.0
+        data(i,9) = -1;
+    end
+end
+
 %% ESKF Simulation
 % Initialize state and P
-x = zeros(10, 1); x(7) = 1.0; x(3) = 0.7;
+x = zeros(10, 1); x(7) = 1.0; x(3) = 0.06;
 P = zeros(9,9);
 %P = diag(ones(1,9));
 
@@ -21,15 +33,16 @@ X = [];
 % This way, each iteration simulates the arrival of new data from
 % a specific sensor
 previousTimestamp = 1;
+previousFlowTimestamp = 1;
 
 for i = 2 : length(data(:,1))
     timestamp = data(i, 1);
-    sensor_data = data(i, 2:end);
+    sensor_data = data(i, 2:end); 
     
     % We can know if sensor data is available via the index and the value
     IMUData = (sensor_data(1) ~= 1000.0) && (sensor_data(2) ~= 1000.0) && (sensor_data(3) ~= 1000.0) && (sensor_data(4) ~= 1000.0) && (sensor_data(5) ~= 1000.0) && (sensor_data(6) ~= 1000.0); 
     accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
-    rangeData = sensor_data(7) ~= 1000.0; 
+    rangeData = sensor_data(7) ~= 1000.0 && IMUData; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0;
 
     sensor_data(1) = sensor_data(1) * 9.80665;
@@ -52,7 +65,12 @@ for i = 2 : length(data(:,1))
         [x, P] = rangeCorrect(x, P, sensor_data);
     end
     if (flowData)
+        dt = timestamp - data(previousFlowTimestamp,1);
+        sensor_data(8) = -sensor_data(8)/dt;
+        sensor_data(9) = sensor_data(9)/dt;
+        disp(sensor_data(8))
         [x, P] = flowCorrect(x, P, sensor_data);
+        previousFlowTimestamp = i;
     end
     
     X = [X, x]; % Log state after estimations
@@ -84,7 +102,6 @@ figure;
 quats = X(7:10,:);
 vels = [];
 for i = 1 : length(quats(1,:))
-    quats(:, i)
     R = q2R(quats(:, i));
     vels = [vels, R*[X(4,i); X(5,i);X(6,i)]];
 end
