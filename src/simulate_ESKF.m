@@ -3,21 +3,9 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_5.csv");
+   data = csvread("../data/raw_data_9.csv");
 catch
    % do nothing, just avoid throwing an error
-end
-
-% overwrite flow data
-for i = 2447:5255
-    if data(i,9) ~= 1000.0
-        data(i,9) = 1;
-    end
-end
-for i = 5943:7598
-    if data(i,9) ~= 1000.0
-        data(i,9) = -1;
-    end
 end
 
 %% ESKF Simulation
@@ -68,8 +56,8 @@ for i = 2 : length(data(:,1))
         dt = timestamp - data(previousFlowTimestamp,1);
         sensor_data(8) = -sensor_data(8)/dt;
         sensor_data(9) = sensor_data(9)/dt;
-        disp(sensor_data(8))
         [x, P] = flowCorrect(x, P, sensor_data);
+        %[x, P] = flowCorrect2(x, P, sensor_data, dt);
         previousFlowTimestamp = i;
     end
     
@@ -87,6 +75,21 @@ plot(data(2:end,1), X(1,:)', 'b');
 plot(data(2:end,1), X(2,:)', 'r');
 plot(data(2:end,1), X(3,:)', 'g');
 title('Positions')
+
+figure;
+% plot trajectory estimation
+hold on;
+grid on;
+plot(X(1,:)', X(2,:), 'k');
+title('2D trajectory')
+
+figure;
+% plot trajectory estimation
+hold on;
+grid on;
+plot3(X(1,:), X(2,:), X(3,:));
+view(45,45)
+title('3D trajectory')
 
 figure;
 % plot velocity estimation
