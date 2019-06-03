@@ -54,10 +54,10 @@ for i = 2 : length(data(:,1))
     end
     if (flowData)
         dt = timestamp - data(previousFlowTimestamp,1);
-        sensor_data(8) = -sensor_data(8)/dt;
-        sensor_data(9) = sensor_data(9)/dt;
-        [x, P] = flowCorrect(x, P, sensor_data);
-        %[x, P] = flowCorrect2(x, P, sensor_data, dt);
+        %sensor_data(8) = -sensor_data(8)/dt;
+        %sensor_data(9) = sensor_data(9)/dt;
+        %[x, P] = flowCorrect(x, P, sensor_data);
+        [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
         previousFlowTimestamp = i;
     end
     
