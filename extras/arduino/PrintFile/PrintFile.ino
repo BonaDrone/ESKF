@@ -20,7 +20,7 @@ File myFile;
 void setup(void)
 {
 
-	Serial.begin(9600);
+	Serial.begin(115200);
 
 	DOSFS.begin();
 	

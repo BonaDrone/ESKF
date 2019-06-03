@@ -8,7 +8,7 @@ import time
 
 # Serial parameters
 PORT = '/dev/ttyACM0'
-BAUDRATE = 9600
+BAUDRATE = 115200
 LOG_DURATION = 10000
 
 
