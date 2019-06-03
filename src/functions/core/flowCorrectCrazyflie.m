@@ -42,7 +42,6 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
   % compute innovation and covariance
   % z = y(8:9) - h;
   z = [measuredNX - predictedNX; measuredNY - predictedNY];
-  disp(z);
   Z = H*P*H.' + N;
   % compute gain
   K = (P*H.')/Z;
