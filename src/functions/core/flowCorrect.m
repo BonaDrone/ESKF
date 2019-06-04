@@ -22,11 +22,11 @@ function [x,P] = flowCorrect(x,P,y)
  
 %     H = [0 0 0 1 0 0 0 0 0; 0 0 0 0 1 0 0 0 0]; 
 
-    meas = [sign(y(8))*0.02; 0];
+    %meas = [sign(y(8))*0.02; 0];
 
     % compute innovation and covariance
-    % z = y(8:9) - h;
-    z = meas - h;
+    z = y(8:9) - h;
+    %z = meas - h;
     Z = H*P*H.' + N;
     % compute gain
     K = (P*H.')/Z;
