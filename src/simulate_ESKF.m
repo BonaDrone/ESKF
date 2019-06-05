@@ -4,7 +4,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/datalog_25.csv");
+   data = csvread("../data/raw_data_16.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -28,6 +28,8 @@ X = [];
 previousTimestamp = 1;
 previousFlowTimestamp = 1;
 
+co = 0;
+
 for i = 2 : length(data(:,1))
     % Separate sensor data and arrival time
     timestamp = data(i, 1);
@@ -35,7 +37,7 @@ for i = 2 : length(data(:,1))
     
     % We can know which sensor is providing us with new data via the index and the value
     IMUData = (sensor_data(1) ~= 1000.0) && (sensor_data(2) ~= 1000.0) && (sensor_data(3) ~= 1000.0) && (sensor_data(4) ~= 1000.0) && (sensor_data(5) ~= 1000.0) && (sensor_data(6) ~= 1000.0); 
-    accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
+    accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0); 
     rangeData = sensor_data(7) ~= 1000.0; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0;
 
@@ -49,18 +51,30 @@ for i = 2 : length(data(:,1))
     sensor_data(6) = sensor_data(6) * pi / 180;
     
     if (IMUData)
-        dt = timestamp - data(previousTimestamp,1);
+        dt = timestamp - data(i-1,1);
         [x, P] = updateState(x, P, sensor_data, dt);
-        previousTimestamp = i;
+        lastIMUData = sensor_data(1:6);
+    else
+        dt = timestamp - data(i-1,1);
+        [x, P] = updateState(x, P, lastIMUData, dt);
     end
-    if (accelData)
-        [x, P] = accelCorrect(x, P, sensor_data);
-    end
+%     if (accelData)
+%         [x, P] = accelCorrect(x, P, sensor_data);
+%     end
     if (rangeData)
         [x, P] = rangeCorrect(x, P, sensor_data);
     end
     if (flowData && abs(sensor_data(8)) < FLOW_LIMIT && abs(sensor_data(9)) < FLOW_LIMIT)
         dt = timestamp - data(previousFlowTimestamp,1);
+        % If there is no IMU data then sensor_data(1:6) = 1000.0. Since
+        % the Optical Flow correction model makes use of the angular
+        % velocities to predict the number of pixels we set the first 6
+        % values of the sensor data array (IMU Data) to the last IMU
+        % measurements to prevent 1000 being used as the values of angular
+        % velocities.
+        if (~ IMUData)
+            sensor_data(1:6) = lastIMUData;
+        end
         % sensor_data(8) = -sensor_data(8)/dt;
         % sensor_data(9) = sensor_data(9)/dt;
         % [x, P] = flowCorrect(x, P, sensor_data);
