@@ -156,7 +156,7 @@ void loop() {
 
   uint32_t currentTime = micros();
   
-  if(currentTime - startTime < 180 * 1000000)
+  if(currentTime - startTime < 240 * 1000000)
   {
     
     digitalWrite(blue, 0);
