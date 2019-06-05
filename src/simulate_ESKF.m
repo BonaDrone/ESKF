@@ -4,7 +4,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_16.csv");
+   data = csvread("../data/raw_data_17.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -34,7 +34,7 @@ for i = 2 : length(data(:,1))
     
     % We can know which sensor is providing us with new data via the index and the value
     IMUData = (sensor_data(1) ~= 1000.0) && (sensor_data(2) ~= 1000.0) && (sensor_data(3) ~= 1000.0) && (sensor_data(4) ~= 1000.0) && (sensor_data(5) ~= 1000.0) && (sensor_data(6) ~= 1000.0); 
-    accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0); 
+    accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
     rangeData = sensor_data(7) ~= 1000.0; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0;
 
@@ -46,6 +46,10 @@ for i = 2 : length(data(:,1))
     sensor_data(4) = sensor_data(4) * pi / 180;
     sensor_data(5) = sensor_data(5) * pi / 180;
     sensor_data(6) = sensor_data(6) * pi / 180;
+    
+    if (~IMUData && i==2)
+       lastIMUData = [sensor_data(1:3)*9.80665, sensor_data(4:6)* pi / 180];
+    end
     
     if (IMUData)
         dt = timestamp - data(i-1,1);
