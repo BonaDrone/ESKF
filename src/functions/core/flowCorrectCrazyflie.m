@@ -2,7 +2,7 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-  persistent n; n = 0.1;
+  persistent n; n = 0.0625;
   persistent N; N = [n, 0; 0, n];
 
   % Saturate elevation in prediction and correction to avoid singularities
