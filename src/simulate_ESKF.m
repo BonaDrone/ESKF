@@ -3,16 +3,19 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_9.csv");
+   data = csvread("../data/datalog_25.csv");
 catch
    % do nothing, just avoid throwing an error
 end
 
 %% ESKF Simulation
+% Flow Outlier detection
+FLOW_LIMIT = 30;
+
 % Initialize state and P
 x = zeros(10, 1); x(7) = 1.0; x(3) = 0.06;
-P = zeros(9,9);
-%P = diag(ones(1,9));
+%P = zeros(9,9);
+P = diag(ones(1,9));
 
 X = [];
 
@@ -30,7 +33,7 @@ for i = 2 : length(data(:,1))
     % We can know if sensor data is available via the index and the value
     IMUData = (sensor_data(1) ~= 1000.0) && (sensor_data(2) ~= 1000.0) && (sensor_data(3) ~= 1000.0) && (sensor_data(4) ~= 1000.0) && (sensor_data(5) ~= 1000.0) && (sensor_data(6) ~= 1000.0); 
     accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
-    rangeData = sensor_data(7) ~= 1000.0 && IMUData; 
+    rangeData = sensor_data(7) ~= 1000.0; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0;
 
     sensor_data(1) = sensor_data(1) * 9.80665;
@@ -52,7 +55,7 @@ for i = 2 : length(data(:,1))
     if (rangeData)
         [x, P] = rangeCorrect(x, P, sensor_data);
     end
-    if (flowData)
+    if (flowData && abs(sensor_data(8)) < FLOW_LIMIT && abs(sensor_data(9)) < FLOW_LIMIT)
         dt = timestamp - data(previousFlowTimestamp,1);
         %sensor_data(8) = -sensor_data(8)/dt;
         %sensor_data(9) = sensor_data(9)/dt;
@@ -60,7 +63,7 @@ for i = 2 : length(data(:,1))
         [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
         previousFlowTimestamp = i;
     end
-    
+    %x(10) = 0;
     X = [X, x]; % Log state after estimations
 
 end
@@ -81,6 +84,9 @@ figure;
 hold on;
 grid on;
 plot(X(1,:)', X(2,:), 'k');
+% This might need some tuning
+ylim([-2 2])
+xlim([-2 2])
 title('2D trajectory')
 
 figure;
@@ -88,6 +94,10 @@ figure;
 hold on;
 grid on;
 plot3(X(1,:), X(2,:), X(3,:));
+% This might need some tuning
+ylim([-2 2])
+xlim([-2 2])
+zlim([0 1])
 view(45,45)
 title('3D trajectory')
 
@@ -95,9 +105,9 @@ figure;
 % plot velocity estimation
 hold on;
 grid on;
-plot(data(2:end,1), X(4,:)', 'b');
-plot(data(2:end,1), X(5,:)', 'r');
 plot(data(2:end,1), X(6,:)', 'g');
+plot(data(2:end,1), X(5,:)', 'r');
+plot(data(2:end,1), X(4,:)', 'b');
 title('Velocities')
 
 figure;
