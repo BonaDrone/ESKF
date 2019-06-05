@@ -1,6 +1,6 @@
 function [x,P] = rangeCorrect(x,P,y)
-%RANGECORRECT Summary of this function goes here
-%   Detailed explanation goes here
+%RANGECORRECT Correct state estimation with range data
+%
 
     persistent N; N = 0.01;
     

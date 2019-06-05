@@ -1,5 +1,6 @@
 clc; clear
 format long;
+
 %% Load raw data
 % try catch structure for debugging
 try
@@ -9,6 +10,7 @@ catch
 end
 
 %% ESKF Simulation
+
 % Flow Outlier detection
 FLOW_LIMIT = 30;
 
@@ -22,20 +24,22 @@ X = [];
 % Iterate through all rows of raw data. It is assumed here that
 % sensor data has already been collected at the desired frequencies.
 % This way, each iteration simulates the arrival of new data from
-% a specific sensor
+% a specific sensor and updates/corrects the state accordingly
 previousTimestamp = 1;
 previousFlowTimestamp = 1;
 
 for i = 2 : length(data(:,1))
+    % Separate sensor data and arrival time
     timestamp = data(i, 1);
     sensor_data = data(i, 2:end); 
     
-    % We can know if sensor data is available via the index and the value
+    % We can know which sensor is providing us with new data via the index and the value
     IMUData = (sensor_data(1) ~= 1000.0) && (sensor_data(2) ~= 1000.0) && (sensor_data(3) ~= 1000.0) && (sensor_data(4) ~= 1000.0) && (sensor_data(5) ~= 1000.0) && (sensor_data(6) ~= 1000.0); 
     accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
     rangeData = sensor_data(7) ~= 1000.0; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0;
 
+    % Map sensor data to the units the filter expects
     sensor_data(1) = sensor_data(1) * 9.80665;
     sensor_data(2) = sensor_data(2) * 9.80665;
     sensor_data(3) = sensor_data(3) * 9.80665;
@@ -57,18 +61,18 @@ for i = 2 : length(data(:,1))
     end
     if (flowData && abs(sensor_data(8)) < FLOW_LIMIT && abs(sensor_data(9)) < FLOW_LIMIT)
         dt = timestamp - data(previousFlowTimestamp,1);
-        %sensor_data(8) = -sensor_data(8)/dt;
-        %sensor_data(9) = sensor_data(9)/dt;
-        %[x, P] = flowCorrect(x, P, sensor_data);
+        % sensor_data(8) = -sensor_data(8)/dt;
+        % sensor_data(9) = sensor_data(9)/dt;
+        % [x, P] = flowCorrect(x, P, sensor_data);
         [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
         previousFlowTimestamp = i;
     end
-    %x(10) = 0;
+    % x(10) = 0;
     X = [X, x]; % Log state after estimations
 
 end
 
-%% Plot state evolution
+%% After the simulation, plot the state evolution
 
 figure;
 % plot position estimation

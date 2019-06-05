@@ -1,5 +1,5 @@
 function [x] = injectErrors(x,dx)
-%INJECTERRORS Summary of this function goes here
+%INJECTERRORS inject the computed state errors in the state
 %   Detailed explanation goes here
 
     % Inject position and velocity errors

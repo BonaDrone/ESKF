@@ -38,6 +38,6 @@ function [x, P] = updateState(x, P, y, dt)
             0, 0, 0,  0,  0,  0,                                                          dt*y(5),                                                         -dt*y(4),                                                               1];
 
     % Predict covariance
-    P = Fn*P*Fn.' + Q; % Fi*Q*Fi.';
+    P = Fn*P*Fn.' + Q; % Q is already Fi*Q*Fi.';
     
 end

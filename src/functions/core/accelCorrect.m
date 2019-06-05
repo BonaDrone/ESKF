@@ -1,6 +1,7 @@
 function [x,P] = accelCorrect(x,P,y)
-%ACCELCORRECT Summary of this function goes here
-%   Detailed explanation goes here
+%ACCELCORRECT Correct state estimation with accelerometer data
+%
+
     persistent n; n = 0.7;
     persistent N; N = [n, 0, 0; 0, n, 0; 0, 0, n];
     persistent g; g = 9.80665;

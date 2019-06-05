@@ -1,6 +1,6 @@
 function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%FLOWCORRECTCRAZYFLIE Correct state estimation with flow data
+%   
 
   persistent n; n = 0.0625;
   persistent N; N = [n, 0; 0, n];
@@ -14,9 +14,8 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
   
   R = q2R([x(7), x(8), x(9), x(10)]);
   
-  Npix = 30.0;                      % [pixels] (same in x and y)
-  %float thetapix = DEG_TO_RAD * 4.0f;     % [rad]    (same in x and y)
-  thetapix = (pi/180) * 4.2;
+  Npix = 30.0; % [pixels] (same in x and y)
+  thetapix = (pi/180) * 4.2; % [rad] (same in x and y)
   omegaFactor = 1.25;
   
   % predicted number of accumulated pixels
@@ -40,7 +39,6 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
         0 0 h_zy  0   h_vy 0 0 0 0;];
   
   % compute innovation and covariance
-  % z = y(8:9) - h;
   z = [measuredNX - predictedNX; measuredNY - predictedNY];
   Z = H*P*H.' + N;
   % compute gain
