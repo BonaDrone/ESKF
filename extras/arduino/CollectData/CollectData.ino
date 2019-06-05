@@ -86,8 +86,15 @@ bool distanceAvailable(float & distance)
 const uint8_t blue = 38;
 const uint8_t red = 25;
 
+// Collection freqs
+int FLOW_FREQ = 25; // Hz
+int ACCEL_FREQ = 100; // Hz
+uint32_t FLOW_MICROS = (1 / FLOW_FREQ) * 1000000;
+uint32_t ACCEL_MICROS = (1 / ACCEL_FREQ) * 1000000;
+
 uint32_t startTime;
 uint32_t lastFlowTime;
+uint32_t lastAccelTime;
 
 //uint16_t FLOW_OUTLIER = 30;
 
@@ -149,6 +156,7 @@ void setup() {
 
     startTime = micros();
     lastFlowTime = micros();
+    lastAccelTime = micros();
 
 }
 
@@ -156,7 +164,7 @@ void loop() {
 
   uint32_t currentTime = micros();
   
-  if(currentTime - startTime < 240 * 1000000)
+  if(currentTime - startTime < 45 * 1000000)
   {
     
     digitalWrite(blue, 0);
@@ -171,7 +179,24 @@ void loop() {
     _gy = 1000.0;
     _gz = 1000.0;
 
-    bool imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
+    bool accelData = false;
+    bool imuData = false;
+
+    // Since we collect IMU data at max speed and accel and 
+    // IMU data come from the same source, we prioritize collecting
+    // accel data when required. Otherwise we would never collect
+    // accel data.
+    if (currentTime - lastAccelTime > 8000)
+    {
+        accelData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
+        _gx = 1000.0;
+        _gy = 1000.0;
+        _gz = 1000.0;
+        lastAccelTime = currentTime;
+    } else {
+        imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
+    }
+
 
     // Range
     float _d;
@@ -180,8 +205,8 @@ void loop() {
     bool rangeData = distanceAvailable(_d);
 
     // Optical Flow
-    int16_t deltaX=1000, deltaY=1000;
-    if (currentTime - lastFlowTime > 40000) // 25Hz
+    int16_t deltaX = 1000, deltaY = 1000;
+    if (currentTime - lastFlowTime > FLOW_MICROS)
     {
       flow.readMotionCount(&deltaX, &deltaY);
       lastFlowTime = currentTime;
@@ -212,5 +237,6 @@ void loop() {
     digitalWrite(blue, 1);
     digitalWrite(red, 0);
     datalog.close();
+
   }
 }
