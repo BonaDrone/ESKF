@@ -181,7 +181,7 @@ void loop() {
 
     // Optical Flow
     int16_t deltaX=1000, deltaY=1000;
-    if (currentTime - lastFlowTime > 200000) // 5Hz
+    if (currentTime - lastFlowTime > 40000) // 25Hz
     {
       flow.readMotionCount(&deltaX, &deltaY);
       lastFlowTime = currentTime;
