@@ -120,7 +120,7 @@ void Cycle(void)
 
 
     // second stage, move z up
-    zUP();
+    //zUP();
 
     // third stage, move x and z at the same time
     xz_doUpCycle();
@@ -139,7 +139,7 @@ void Cycle(void)
     xz_doDownCycle();
 
     // Fifth stage
-    zDown();
+    //zDown();
 }
 
 void x_doCycle(float vel)
@@ -234,7 +234,7 @@ void zUP(void)
 {
   float vel = 20;
 
-  zAxis.moveTo(zGear*-320);
+  zAxis.moveTo(zGear*-280);
   zAxis.setSpeed(zGear*vel);
   
   while (zAxis.currentPosition() != zAxis.targetPosition())
@@ -250,7 +250,7 @@ void zDown(void)
 {
   float vel = 20;
 
-  zAxis.moveTo(zGear*320);
+  zAxis.moveTo(zGear*280);
   zAxis.setSpeed(zGear*vel);
   
   while (zAxis.currentPosition() != zAxis.targetPosition())
