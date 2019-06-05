@@ -25,10 +25,7 @@ X = [];
 % sensor data has already been collected at the desired frequencies.
 % This way, each iteration simulates the arrival of new data from
 % a specific sensor and updates/corrects the state accordingly
-previousTimestamp = 1;
 previousFlowTimestamp = 1;
-
-co = 0;
 
 for i = 2 : length(data(:,1))
     % Separate sensor data and arrival time
@@ -81,7 +78,7 @@ for i = 2 : length(data(:,1))
         [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
         previousFlowTimestamp = i;
     end
-    % x(10) = 0;
+    
     X = [X, x]; % Log state after estimations
 
 end
