@@ -4,7 +4,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_17.csv");
+   data = csvread("../data/raw_data_2.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -59,9 +59,9 @@ for i = 2 : length(data(:,1))
         dt = timestamp - data(i-1,1);
         [x, P] = updateState(x, P, lastIMUData, dt);
     end
-%     if (accelData)
-%         [x, P] = accelCorrect(x, P, sensor_data);
-%     end
+    if (accelData)
+        [x, P] = accelCorrect(x, P, sensor_data);
+    end
     if (rangeData)
         [x, P] = rangeCorrect(x, P, sensor_data);
     end
