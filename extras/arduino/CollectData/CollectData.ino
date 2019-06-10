@@ -89,8 +89,8 @@ const uint8_t red = 25;
 // Collection freqs
 int FLOW_FREQ = 25; // Hz
 int ACCEL_FREQ = 100; // Hz
-uint32_t FLOW_MICROS = (1 / FLOW_FREQ) * 1000000;
-uint32_t ACCEL_MICROS = (1 / ACCEL_FREQ) * 1000000;
+uint32_t FLOW_MICROS = 1000000 / FLOW_FREQ;
+uint32_t ACCEL_MICROS = 1000000 / ACCEL_FREQ;
 
 uint32_t startTime;
 uint32_t lastFlowTime;
@@ -164,7 +164,7 @@ void loop() {
 
   uint32_t currentTime = micros();
   
-  if(currentTime - startTime < 45 * 1000000)
+  if(currentTime - startTime < 30 * 1000000)
   {
     
     digitalWrite(blue, 0);
@@ -186,7 +186,7 @@ void loop() {
     // IMU data come from the same source, we prioritize collecting
     // accel data when required. Otherwise we would never collect
     // accel data.
-    if (currentTime - lastAccelTime > 8000)
+    if (currentTime - lastAccelTime > ACCEL_MICROS)
     {
         accelData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
         _gx = 1000.0;
