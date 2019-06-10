@@ -3,7 +3,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_19.csv");
+   data = csvread("../data/raw_data_27.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -35,16 +35,19 @@ title('accelerations')
 ylim([-0.2 1.2])
 
 subplot(4,1,2);
+hold on;
 grid on;
 plot(tx, accelx, 'b');
 title('x-axis acceleration (g)')  
 
 subplot(4,1,3);
+hold on;
 grid on;
 plot(ty, accely, 'r');
 title('y-axis acceleration (g)')
 
 subplot(4,1,4);
+hold on;
 grid on;
 plot(tz, accelz, 'g');
 title('z-axis acceleration (g)')
@@ -73,6 +76,7 @@ title('angular velocities (rad/s)')
 
 figure;
 % Plot range height
+hold on;
 grid on;
 range = data(:,8);
 
