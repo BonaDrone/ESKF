@@ -3,7 +3,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_5.csv");
+   data = csvread("../data/raw_data_19.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -73,7 +73,6 @@ title('angular velocities (rad/s)')
 
 figure;
 % Plot range height
-subplot(2,1,1)
 grid on;
 range = data(:,8);
 
@@ -84,9 +83,8 @@ range = range(range ~= 1000.0);
 plot(tr, range, 'b');
 title('height (m)')
 
-
+figure;
 % Plot flows
-subplot(2,1,2)
 hold on;
 grid on;
 flowx = data(:,9);
