@@ -177,7 +177,16 @@ void setup() {
     lastFlowTime = micros();
     lastAccelTime = micros();
 
+    digitalWrite(blue, 0);
+
 }
+
+// IMU
+float _ax, _ay, _az, _gx, _gy, _gz;
+// Range
+float _d;
+// Flow
+int16_t deltaX, deltaY;
 
 void loop() {
 
@@ -187,11 +196,7 @@ void loop() {
   if(currentTime - startTime < 30 * 1000000)
   {
     
-    digitalWrite(blue, 0);
-    
     // Read sensor data
-    // IMU
-    float _ax, _ay, _az, _gx, _gy, _gz;
     _ax = 1000.0; // 1000 is an unlikely value to be read from any of the sensors, so it is used to indicate no data
     _ay = 1000.0;
     _az = 1000.0;
@@ -223,7 +228,6 @@ void loop() {
 
     // Range
     bool rangeData = false;
-    float _d;
     _d = 1000.0;
     if (currentTime - lastRangeTime > RANGE_MICROS)
     {
@@ -231,7 +235,8 @@ void loop() {
         lastRangeTime = currentTime;
     }
     // Optical Flow
-    int16_t deltaX = 1000, deltaY = 1000;
+    deltaX = 1000;
+    deltaY = 1000;
     if (currentTime - lastFlowTime > FLOW_MICROS)
     {
       flow.readMotionCount(&deltaX, &deltaY);
