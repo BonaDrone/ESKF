@@ -136,7 +136,7 @@ void setup() {
     delay(100);
     // Clear the interrupt
     _lsm6dsm.clearInterrupt();
-    _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS, 127);
+    _lsm6dsm.calibrate(GYRO_BIAS, ACCEL_BIAS, 150);
 
 
     if (!flow.begin()) {

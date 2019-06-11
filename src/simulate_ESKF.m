@@ -4,7 +4,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_2.csv");
+   data = csvread("../data/raw_data_26.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -12,12 +12,11 @@ end
 %% ESKF Simulation
 
 % Flow Outlier detection
-FLOW_LIMIT = 30;
-
+FLOW_LIMIT = 1000;
 % Initialize state and P
-x = zeros(10, 1); x(7) = 1.0; x(3) = 0.06;
-%P = zeros(9,9);
-P = diag(ones(1,9));
+x = zeros(10, 1); x(7) = 1.0; x(3) = 0.0;
+P = zeros(9,9);
+%P = diag(ones(1,9));
 
 X = [];
 
@@ -76,9 +75,9 @@ for i = 2 : length(data(:,1))
         if (~ IMUData)
             sensor_data(1:6) = lastIMUData;
         end
-        % sensor_data(8) = -sensor_data(8)/dt;
-        % sensor_data(9) = sensor_data(9)/dt;
-        % [x, P] = flowCorrect(x, P, sensor_data);
+%         sensor_data(8) = -sensor_data(8)/dt;
+%         sensor_data(9) = sensor_data(9)/dt;
+%         [x, P] = flowCorrect(x, P, sensor_data);
         [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
         previousFlowTimestamp = i;
     end
