@@ -3,7 +3,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_27.csv");
+   data = csvread("../data/raw_data_35.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -52,6 +52,14 @@ grid on;
 plot(tz, accelz, 'g');
 title('z-axis acceleration (g)')
 
+% Plot sampling intervals
+figure;
+hold on;
+plot(1./(tx(2:end)-tx(1:end-1)), 'b');
+plot(1./(ty(2:end)-ty(1:end-1)), 'r');
+plot(1./(tz(2:end)-tz(1:end-1)), 'g');
+title('accel sampling frquency')
+
 figure;
 % Plot angular velocities
 hold on;
@@ -73,6 +81,14 @@ plot(ty, gyroy, 'r');
 plot(tz, gyroz, 'g');
 title('angular velocities (rad/s)')
 
+% Plot sampling intervals
+figure;
+hold on;
+plot(1./(tx(2:end)-tx(1:end-1)), 'b');
+plot(1./(ty(2:end)-ty(1:end-1)), 'r');
+plot(1./(tz(2:end)-tz(1:end-1)), 'g');
+title('gyro sampling frequency')
+
 
 figure;
 % Plot range height
@@ -86,6 +102,11 @@ range = range(range ~= 1000.0);
 
 plot(tr, range, 'b');
 title('height (m)')
+
+% Plot sampling intervals
+figure;
+plot(1./(tr(2:end)-tr(1:end-1)), 'b');
+title('range sampling frequency')
 
 figure;
 % Plot flows
@@ -103,3 +124,10 @@ flowy = flowy(flowy ~= 1000.0);
 plot(tx, flowx, 'b');
 plot(ty, flowy, 'r');
 title('flows (accumulated pixels)')
+
+% Plot sampling intervals
+figure;
+hold on;
+plot(1./(tx(2:end)-tx(1:end-1)), 'b');
+plot(1./(ty(2:end)-ty(1:end-1)), 'r');
+title('flow sampling frequency')
