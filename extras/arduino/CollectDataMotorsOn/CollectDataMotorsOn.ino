@@ -92,15 +92,18 @@ const uint8_t red = 25;
 // Collection freqs
 int FLOW_FREQ = 25; // Hz
 int ACCEL_FREQ = 100; // Hz
+int IMU_FREQ = 250; // Hz
+int RANGE_FREQ = 75; // Hz
 uint32_t FLOW_MICROS = 1000000 / FLOW_FREQ;
 uint32_t ACCEL_MICROS = 1000000 / ACCEL_FREQ;
+uint32_t IMU_MICROS = 1000000 / IMU_FREQ;
+uint32_t RANGE_MICROS = 1000000 / RANGE_FREQ;
 
 uint32_t startTime;
 uint32_t lastFlowTime;
 uint32_t lastAccelTime;
-
-//uint16_t FLOW_OUTLIER = 30;
-
+uint32_t lastIMUTime;
+uint32_t lastRangeTime;
 
 void setup() {
   
@@ -164,6 +167,12 @@ void setup() {
 
     delay(3000);
 
+    // Motors at 50% power
+    analogWrite(MOTOR_PINS[0], (uint8_t)(0.5 * 255));
+    analogWrite(MOTOR_PINS[1], (uint8_t)(0.5 * 255));
+    analogWrite(MOTOR_PINS[2], (uint8_t)(0.5 * 255));
+    analogWrite(MOTOR_PINS[3], (uint8_t)(0.5 * 255));
+
     startTime = micros();
     lastFlowTime = micros();
     lastAccelTime = micros();
@@ -179,12 +188,6 @@ void loop() {
   {
     
     digitalWrite(blue, 0);
-
-    // Motors at 50% power
-    analogWrite(MOTOR_PINS[0], (uint8_t)(0.5 * 255));
-    analogWrite(MOTOR_PINS[1], (uint8_t)(0.5 * 255));
-    analogWrite(MOTOR_PINS[2], (uint8_t)(0.5 * 255));
-    analogWrite(MOTOR_PINS[3], (uint8_t)(0.5 * 255));
     
     // Read sensor data
     // IMU
@@ -195,6 +198,7 @@ void loop() {
     _gx = 1000.0;
     _gy = 1000.0;
     _gz = 1000.0;
+
 
     bool accelData = false;
     bool imuData = false;
@@ -210,16 +214,19 @@ void loop() {
         _gy = 1000.0;
         _gz = 1000.0;
         lastAccelTime = currentTime;
-    } else {
+    } else if (currentTime - lastIMUTime > IMU_MICROS) 
+    {
         imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
     }
 
 
     // Range
+    bool rangeData = false;
     float _d;
     _d = 1000.0;
-
-    bool rangeData = distanceAvailable(_d);
+    if (currentTime - lastRangeTime > RANGE_MICROS)
+    {
+        bool rangeData = distanceAvailable(_d);
 
     // Optical Flow
     int16_t deltaX = 1000, deltaY = 1000;
