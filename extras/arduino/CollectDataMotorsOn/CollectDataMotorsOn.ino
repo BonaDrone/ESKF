@@ -227,7 +227,7 @@ void loop() {
     if (currentTime - lastRangeTime > RANGE_MICROS)
     {
         bool rangeData = distanceAvailable(_d);
-
+    }
     // Optical Flow
     int16_t deltaX = 1000, deltaY = 1000;
     if (currentTime - lastFlowTime > FLOW_MICROS)
