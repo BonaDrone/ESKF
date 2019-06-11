@@ -217,6 +217,7 @@ void loop() {
     } else if (currentTime - lastIMUTime > IMU_MICROS) 
     {
         imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
+        lastIMUTime = currentTime;
     }
 
 
@@ -227,6 +228,7 @@ void loop() {
     if (currentTime - lastRangeTime > RANGE_MICROS)
     {
         bool rangeData = distanceAvailable(_d);
+        lastRangeTime = currentTime;
     }
     // Optical Flow
     int16_t deltaX = 1000, deltaY = 1000;
