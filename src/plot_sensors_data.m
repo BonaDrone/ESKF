@@ -3,7 +3,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_35.csv");
+   data = csvread("../data/raw_data_27.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -87,7 +87,7 @@ hold on;
 plot(1./(tx(2:end)-tx(1:end-1)), 'b');
 plot(1./(ty(2:end)-ty(1:end-1)), 'r');
 plot(1./(tz(2:end)-tz(1:end-1)), 'g');
-title('gyro sampling frequency')
+title('IMU sampling frequency')
 
 
 figure;
