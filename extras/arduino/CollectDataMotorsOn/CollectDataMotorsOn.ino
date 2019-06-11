@@ -175,6 +175,7 @@ void setup() {
 
     startTime = micros();
     lastFlowTime = micros();
+    
     lastAccelTime = micros();
 
     digitalWrite(blue, 0);
@@ -193,7 +194,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   uint32_t currentTime = micros();
   
-  if(currentTime - startTime < 30 * 1000000)
+  if(currentTime - startTime < 60 * 1000000)
   {
     
     // Read sensor data
@@ -205,21 +206,22 @@ void loop() {
     _gz = 1000.0;
 
 
-    bool accelData = false;
+//    bool accelData = false;
     bool imuData = false;
 
     // Since we collect IMU data at max speed and accel and 
     // IMU data come from the same source, we prioritize collecting
     // accel data when required. Otherwise we would never collect
     // accel data.
-    if (currentTime - lastAccelTime > ACCEL_MICROS)
-    {
-        accelData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
-        _gx = 1000.0;
-        _gy = 1000.0;
-        _gz = 1000.0;
-        lastAccelTime = currentTime;
-    } else if (currentTime - lastIMUTime > IMU_MICROS) 
+    //if (currentTime - lastAccelTime > ACCEL_MICROS)
+    //{
+    //    accelData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
+    //    _gx = 1000.0;
+    //    _gy = 1000.0;
+    //    _gz = 1000.0;
+    //    lastAccelTime = currentTime;
+    //} else 
+    if (currentTime - lastIMUTime > IMU_MICROS) 
     {
         imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
         lastIMUTime = currentTime;
@@ -243,25 +245,25 @@ void loop() {
       lastFlowTime = currentTime;
     }
     
-    datalog.print((float)currentTime / 1000000.0, 8);
-    datalog.print(",");
-    datalog.print(_ax, 8);
-    datalog.print(",");
-    datalog.print(_ay, 8);
-    datalog.print(",");
-    datalog.print(_az, 8);
-    datalog.print(",");
-    datalog.print(_gx, 8);
-    datalog.print(",");
-    datalog.print(_gy, 8);
-    datalog.print(",");
-    datalog.print(_gz, 8);
-    datalog.print(",");
-    datalog.print(_d, 8);
-    datalog.print(",");
-    datalog.print(float(deltaX), 8);
-    datalog.print(",");
-    datalog.println(float(deltaY), 8);
+    Serial.print((float)currentTime / 1000000.0, 8);
+    Serial.print(",");
+    Serial.print(_ax, 8);
+    Serial.print(",");
+    Serial.print(_ay, 8);
+    Serial.print(",");
+    Serial.print(_az, 8);
+    Serial.print(",");
+    Serial.print(_gx, 8);
+    Serial.print(",");
+    Serial.print(_gy, 8);
+    Serial.print(",");
+    Serial.print(_gz, 8);
+    Serial.print(",");
+    Serial.print(_d, 8);
+    Serial.print(",");
+    Serial.print(float(deltaX), 8);
+    Serial.print(",");
+    Serial.println(float(deltaY), 8);
 
   } else {
 
