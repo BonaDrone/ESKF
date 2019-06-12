@@ -191,8 +191,6 @@ int16_t deltaX, deltaY;
 void loop() {
   // put your main code here, to run repeatedly:
   uint32_t currentTime = micros();
-
-  int numReads = 0;
   
   if(currentTime - startTime < 60 * 1000000)
   {
@@ -273,11 +271,5 @@ void loop() {
     datalog.close();
 
   }
-
-  Serial.print(numReads);
-  Serial.print(",");
-  Serial.println(micros()-currentTime);
-
-  numReads = 0;
   
 }
