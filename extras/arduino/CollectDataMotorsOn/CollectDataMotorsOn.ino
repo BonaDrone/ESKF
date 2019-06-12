@@ -87,17 +87,14 @@ const uint8_t red = 25;
 
 // Collection freqs
 int FLOW_FREQ = 25; // Hz
-int ACCEL_FREQ = 100; // Hz
 int IMU_FREQ = 250; // Hz
 int RANGE_FREQ = 75; // Hz
 uint32_t FLOW_MICROS = 1000000 / FLOW_FREQ;
-uint32_t ACCEL_MICROS = 1000000 / ACCEL_FREQ;
 uint32_t IMU_MICROS = 1000000 / IMU_FREQ;
 uint32_t RANGE_MICROS = 1000000 / RANGE_FREQ;
 
 uint32_t startTime;
 uint32_t lastFlowTime;
-uint32_t lastAccelTime;
 uint32_t lastIMUTime;
 uint32_t lastRangeTime;
 
@@ -171,8 +168,7 @@ void setup() {
 
     startTime = micros();
     lastFlowTime = micros();
-    
-    lastAccelTime = micros();
+    lastIMUTime = micros();
 
     digitalWrite(blue, 0);
 
