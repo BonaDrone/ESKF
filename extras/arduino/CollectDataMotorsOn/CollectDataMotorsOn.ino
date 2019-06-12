@@ -178,6 +178,8 @@ void setup() {
 
 }
 
+// Flag that indicates if there is new data
+bool newData = false;
 // IMU
 float _ax, _ay, _az, _gx, _gy, _gz;
 // Range
@@ -185,15 +187,18 @@ float _d;
 // Flow
 int16_t deltaX, deltaY;
 
-void loop() {
 
+void loop() {
   // put your main code here, to run repeatedly:
   uint32_t currentTime = micros();
+
+  int numReads = 0;
   
   if(currentTime - startTime < 60 * 1000000)
   {
     
     // Read sensor data
+    bool imuData = false;
     _ax = 1000.0; // 1000 is an unlikely value to be read from any of the sensors, so it is used to indicate no data
     _ay = 1000.0;
     _az = 1000.0;
@@ -201,65 +206,59 @@ void loop() {
     _gy = 1000.0;
     _gz = 1000.0;
 
+    // Range
+    bool rangeData = false;
+    _d = 1000.0;
 
-//    bool accelData = false;
-    bool imuData = false;
-
-    // Since we collect IMU data at max speed and accel and 
-    // IMU data come from the same source, we prioritize collecting
-    // accel data when required. Otherwise we would never collect
-    // accel data.
-    //if (currentTime - lastAccelTime > ACCEL_MICROS)
-    //{
-    //    accelData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
-    //    _gx = 1000.0;
-    //    _gy = 1000.0;
-    //    _gz = 1000.0;
-    //    lastAccelTime = currentTime;
-    //} else 
+    // Optical Flow
+    bool OpticalData = false;
+    deltaX = 1000;
+    deltaY = 1000;
+    
     if (currentTime - lastIMUTime > IMU_MICROS) 
     {
         imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
         lastIMUTime = currentTime;
+        newData = true;
     }
 
 
-    // Range
-    bool rangeData = false;
-    _d = 1000.0;
     if (currentTime - lastRangeTime > RANGE_MICROS)
     {
         bool rangeData = distanceAvailable(_d);
         lastRangeTime = currentTime;
+        newData = true;
     }
-    // Optical Flow
-    deltaX = 1000;
-    deltaY = 1000;
+
     if (currentTime - lastFlowTime > FLOW_MICROS)
     {
       flow.readMotionCount(&deltaX, &deltaY);
       lastFlowTime = currentTime;
+      newData = true;
     }
-    
-    Serial.print((float)currentTime / 1000000.0, 8);
-    Serial.print(",");
-    Serial.print(_ax, 8);
-    Serial.print(",");
-    Serial.print(_ay, 8);
-    Serial.print(",");
-    Serial.print(_az, 8);
-    Serial.print(",");
-    Serial.print(_gx, 8);
-    Serial.print(",");
-    Serial.print(_gy, 8);
-    Serial.print(",");
-    Serial.print(_gz, 8);
-    Serial.print(",");
-    Serial.print(_d, 8);
-    Serial.print(",");
-    Serial.print(float(deltaX), 8);
-    Serial.print(",");
-    Serial.println(float(deltaY), 8);
+
+    if (newData) {
+      Serial.print((float)currentTime / 1000000.0, 8);
+      Serial.print(",");
+      Serial.print(_ax, 8);
+      Serial.print(",");
+      Serial.print(_ay, 8);
+      Serial.print(",");
+      Serial.print(_az, 8);
+      Serial.print(",");
+      Serial.print(_gx, 8);
+      Serial.print(",");
+      Serial.print(_gy, 8);
+      Serial.print(",");
+      Serial.print(_gz, 8);
+      Serial.print(",");
+      Serial.print(_d, 8);
+      Serial.print(",");
+      Serial.print(float(deltaX), 8);
+      Serial.print(",");
+      Serial.println(float(deltaY), 8);
+      newData = false;
+    }
 
   } else {
 
@@ -273,4 +272,11 @@ void loop() {
     datalog.close();
 
   }
+
+  Serial.print(numReads);
+  Serial.print(",");
+  Serial.println(micros()-currentTime);
+
+  numReads = 0;
+  
 }
