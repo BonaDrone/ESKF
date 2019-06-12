@@ -4,10 +4,12 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_27.csv");
+   data = csvread("../data/raw_data_33.csv");
 catch
    % do nothing, just avoid throwing an error
 end
+
+data = data(1000:end, :);
 
 %% ESKF Simulation
 
@@ -15,8 +17,8 @@ end
 FLOW_LIMIT = 1000;
 % Initialize state and P
 x = zeros(10, 1); x(7) = 1.0; x(3) = 0.0;
-P = zeros(9,9);
-%P = diag(ones(1,9));
+%P = zeros(9,9);
+P = diag(ones(1,9));
 
 X = [];
 
@@ -26,6 +28,8 @@ X = [];
 % a specific sensor and updates/corrects the state accordingly
 previousFlowTimestamp = 1;
 
+counter = 0;
+
 for i = 2 : length(data(:,1))
     % Separate sensor data and arrival time
     timestamp = data(i, 1);
@@ -33,7 +37,7 @@ for i = 2 : length(data(:,1))
     
     % We can know which sensor is providing us with new data via the index and the value
     IMUData = (sensor_data(1) ~= 1000.0) && (sensor_data(2) ~= 1000.0) && (sensor_data(3) ~= 1000.0) && (sensor_data(4) ~= 1000.0) && (sensor_data(5) ~= 1000.0) && (sensor_data(6) ~= 1000.0); 
-    accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
+    % accelData = (sensor_data(1) ~= 1000.0 && sensor_data(2) ~= 1000.0 && sensor_data(3) ~= 1000.0) && ~IMUData; 
     rangeData = sensor_data(7) ~= 1000.0; 
     flowData = sensor_data(8) ~= 1000.0 && sensor_data(9) ~= 1000.0;
 
@@ -51,15 +55,17 @@ for i = 2 : length(data(:,1))
     end
     
     if (IMUData)
-        dt = timestamp - data(i-1,1);
-        [x, P] = updateState(x, P, sensor_data, dt);
-        lastIMUData = sensor_data(1:6);
-    else
-        dt = timestamp - data(i-1,1);
-        [x, P] = updateState(x, P, lastIMUData, dt);
-    end
-    if (accelData)
-        [x, P] = accelCorrect(x, P, sensor_data);
+        if (counter < 3)
+            dt = timestamp - data(i-1,1);
+            [x, P] = updateState(x, P, sensor_data, dt);
+            lastIMUData = sensor_data(1:6);
+            counter = counter + 1;
+        else
+            dt = timestamp - data(i-1,1);
+            [x, P] = updateState(x, P, lastIMUData, dt);
+            [x, P] = accelCorrect(x, P, sensor_data);
+            counter = 0;
+        end
     end
     if (rangeData)
         [x, P] = rangeCorrect(x, P, sensor_data);
