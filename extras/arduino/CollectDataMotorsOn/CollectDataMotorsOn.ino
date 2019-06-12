@@ -55,12 +55,8 @@ LSM6DSM _lsm6dsm = LSM6DSM(Ascale, Gscale, AODR, GODR, ACCEL_BIAS, GYRO_BIAS);
 
 bool imuRead(float & _ax, float & _ay, float & _az, float & _gx, float & _gy, float & _gz)
 {
-    if (_lsm6dsm.checkNewData()) 
-    {
-        _lsm6dsm.readData(_ax, _ay, _az, _gx, _gy, _gz);
-        return true;
-    } 
-    return false;
+    _lsm6dsm.readData(_ax, _ay, _az, _gx, _gy, _gz);
+    return true;
 }
 
 void i2cerror(const char * devicename)
