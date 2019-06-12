@@ -214,8 +214,16 @@ void loop() {
     bool OpticalData = false;
     deltaX = 1000;
     deltaY = 1000;
+
+    if (currentTime - lastFlowTime > FLOW_MICROS)
+    {
+      flow.readMotionCount(&deltaX, &deltaY);
+      lastFlowTime = currentTime;
+      newData = true;
+      OpticalData = true;
+    }
     
-    if (currentTime - lastIMUTime > IMU_MICROS) 
+    if (currentTime - lastIMUTime > IMU_MICROS && !OpticalData) 
     {
         imuData = imuRead(_ax, _ay, _az, _gx, _gy, _gz);
         lastIMUTime = currentTime;
@@ -223,18 +231,11 @@ void loop() {
     }
 
 
-    if (currentTime - lastRangeTime > RANGE_MICROS)
+    if (currentTime - lastRangeTime > RANGE_MICROS && !OpticalData)
     {
-        bool rangeData = distanceAvailable(_d);
+        rangeData = distanceAvailable(_d);
         lastRangeTime = currentTime;
         newData = true;
-    }
-
-    if (currentTime - lastFlowTime > FLOW_MICROS)
-    {
-      flow.readMotionCount(&deltaX, &deltaY);
-      lastFlowTime = currentTime;
-      newData = true;
     }
 
     if (newData) {
