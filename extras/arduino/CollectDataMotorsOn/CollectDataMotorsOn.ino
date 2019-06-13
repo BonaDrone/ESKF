@@ -267,7 +267,6 @@ void loop() {
     analogWrite(MOTOR_PINS[3], (uint8_t)(0.0 * 255));
     digitalWrite(blue, 1);
     digitalWrite(red, 0);
-    datalog.close();
 
   }
   
