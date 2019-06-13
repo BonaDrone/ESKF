@@ -4,7 +4,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_35.csv");
+   data = csvread("../data/raw_data_40.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -18,7 +18,7 @@ FLOW_LIMIT = 1000;
 % Initialize state and P
 x = zeros(10, 1); x(7) = 1.0; x(3) = 0.0;
 %P = zeros(9,9);
-P = diag(ones(1,9));
+P = 0.5*diag(ones(1,9));
 
 X = [];
 

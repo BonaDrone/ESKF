@@ -5,7 +5,7 @@ function [x, P] = updateState(x, P, y, dt)
     
     persistent Q; % Adjust Q
 
-    Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)), diag(ones(1,3)));
+    Q = blkdiag(zeros(3), 0.05*diag(ones(1,3)), diag(ones(1,3)));
 
     % Q(1,1) = 0; Q(2,2) = 0; Q(3,3) = 0;
     % Q(4,4) = 0.08; Q(5,5) = 0.08; Q(6,6) = 0.08;
@@ -24,9 +24,9 @@ function [x, P] = updateState(x, P, y, dt)
     x(10) = x(10) + (dt*x(7)*y(6))/2 + (dt*x(8)*y(5))/2 - (dt*x(9)*y(4))/2;
  
  
-    q = x(7:10);
     as = y(1:3);
     ws = y(4:6);
+    q = x(7:10);
     
     % Error-State Jacobian
 %     Fn =  [ 1, 0, 0, dt,  0,  0,                                                               0,                                                               0,                                                               0;...
@@ -39,7 +39,7 @@ function [x, P] = updateState(x, P, y, dt)
 %             0, 0, 0,  0,  0,  0,                                                         -dt*y(6),                                                               1,                                                          dt*y(4);...
 %             0, 0, 0,  0,  0,  0,                                                          dt*y(5),                                                         -dt*y(4),                                                               1];
 
-    V  = -fromqtoR(q)*skew(as);     % as -> measured accelerations
+    V  = -q2R(q)*skew(as);          % as -> measured accelerations
     Fi = -skew(ws);                 % ws -> measured angular velocities
         
     A_dx = [zeros(3)   eye(3)   zeros(3); ...

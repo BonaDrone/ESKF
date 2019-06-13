@@ -3,7 +3,7 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
 %   
 
   persistent n; n = 0.0625;
-  %persistent n; n = 1.0;
+%   persistent n; n = 5.0;
   persistent N; N = [n, 0; 0, n];
 
   % Saturate elevation in prediction and correction to avoid singularities
@@ -23,8 +23,8 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
   predictedNX = (dt * Npix / thetapix ) * ((x(4) * R(3,3) / height) - omegaFactor * y(5));
   predictedNY = (dt * Npix / thetapix ) * ((x(5) * R(3,3) / height) + omegaFactor * y(4));
   % measured number of accumulated pixels
-  measuredNX = y(8);
-  measuredNY = y(9);
+  measuredNX = y(9);
+  measuredNY = -y(8);
   
   % Derive x measurement equation with respect to the error states (effectively vx and z)
   h_zx = (Npix * dt / thetapix) * ((R(3,3) * x(4)) / (-height * height));
