@@ -1,4 +1,4 @@
-# Quick sketch that stores serial data in a text file
+# Quick sketch that stores serial data in a csv file
 #
 # Author: Juan Gallostra
 # Date: 16-10-2018
@@ -8,7 +8,7 @@ import time
 from os import listdir
 from os.path import isfile, join
 
-# data path
+# data files' related info
 DATA_PATH = "../data/"
 DATA_FILENAME = "raw_data_"
 DATA_EXTENSION = ".csv"
@@ -19,6 +19,8 @@ BAUDRATE = 115200
 LOG_DURATION = 10000
 
 def get_data_file_name(data_path=DATA_PATH, data_filename=DATA_FILENAME, data_extension=DATA_EXTENSION):
+	"""
+	"""
 	# get data files
 	datafiles = [f for f in listdir(data_path) if (isfile(join(data_path, f)) and data_filename in f)]
 	datafiles += [f for f in listdir(".") if (isfile(join(".", f)) and data_filename in f)]
@@ -29,8 +31,9 @@ def get_data_file_name(data_path=DATA_PATH, data_filename=DATA_FILENAME, data_ex
 	# get next number
 	return data_filename + str(numbers[-1]+1) + data_extension
 
-
 def main(port=PORT, baudrate=BAUDRATE, duration=LOG_DURATION):
+	"""
+	"""
 	# Serial communication object
 	serial_com = serial.Serial(port, baudrate)
 	intial_time = time.time()
