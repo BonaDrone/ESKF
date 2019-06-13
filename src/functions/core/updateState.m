@@ -5,7 +5,7 @@ function [x, P] = updateState(x, P, y, dt)
     
     persistent Q; % Adjust Q
 
-    Q = blkdiag(zeros(3), 0.05*diag(ones(1,3)), diag(ones(1,3)));
+    Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)), diag(ones(1,3)));
 
     % Q(1,1) = 0; Q(2,2) = 0; Q(3,3) = 0;
     % Q(4,4) = 0.08; Q(5,5) = 0.08; Q(6,6) = 0.08;
