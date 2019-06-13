@@ -8,6 +8,8 @@ catch
    % do nothing, just avoid throwing an error
 end
 
+data = data(1000:end, :);
+
 timestamps = data(:,1);
 
 figure;
@@ -87,6 +89,7 @@ hold on;
 plot(1./(tx(2:end)-tx(1:end-1)), 'b');
 plot(1./(ty(2:end)-ty(1:end-1)), 'r');
 plot(1./(tz(2:end)-tz(1:end-1)), 'g');
+ylim([0 300])
 title('IMU sampling frequency')
 
 
@@ -106,6 +109,7 @@ title('height (m)')
 % Plot sampling intervals
 figure;
 plot(1./(tr(2:end)-tr(1:end-1)), 'b');
+ylim([0 100])
 title('range sampling frequency')
 
 figure;
@@ -130,4 +134,5 @@ figure;
 hold on;
 plot(1./(tx(2:end)-tx(1:end-1)), 'b');
 plot(1./(ty(2:end)-ty(1:end-1)), 'r');
+ylim([0 50])
 title('flow sampling frequency')
