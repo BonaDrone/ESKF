@@ -4,7 +4,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_33.csv");
+   data = csvread("../data/raw_data_35.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -28,7 +28,10 @@ X = [];
 % a specific sensor and updates/corrects the state accordingly
 previousFlowTimestamp = 1;
 
+IMU_ACCEL_RATIO = 3;
 counter = 0;
+initFilter = 1;
+firstIter = 0;
 
 for i = 2 : length(data(:,1))
     % Separate sensor data and arrival time
@@ -50,12 +53,12 @@ for i = 2 : length(data(:,1))
     sensor_data(5) = sensor_data(5) * pi / 180;
     sensor_data(6) = sensor_data(6) * pi / 180;
     
-    if (~IMUData && i==2)
-       lastIMUData = [sensor_data(1:3)*9.80665, sensor_data(4:6)* pi / 180];
+    if (~IMUData && (initFilter ~= 0))
+        continue;    
     end
     
     if (IMUData)
-        if (counter < 3)
+        if (counter < IMU_ACCEL_RATIO)
             dt = timestamp - data(i-1,1);
             [x, P] = updateState(x, P, sensor_data, dt);
             lastIMUData = sensor_data(1:6);
@@ -66,6 +69,15 @@ for i = 2 : length(data(:,1))
             [x, P] = accelCorrect(x, P, sensor_data);
             counter = 0;
         end
+        
+        if (initFilter == 1)
+            initFilter = 0;
+            firstIter = i;
+        end
+        
+    else
+        dt = timestamp - data(i-1,1);
+        [x, P] = updateState(x, P, lastIMUData, dt);
     end
     if (rangeData)
         [x, P] = rangeCorrect(x, P, sensor_data);
@@ -98,9 +110,9 @@ figure;
 % plot position estimation
 hold on;
 grid on;
-plot(data(2:end,1), X(1,:)', 'b');
-plot(data(2:end,1), X(2,:)', 'r');
-plot(data(2:end,1), X(3,:)', 'g');
+plot(data(firstIter:end,1), X(1,:)', 'b');
+plot(data(firstIter:end,1), X(2,:)', 'r');
+plot(data(firstIter:end,1), X(3,:)', 'g');
 title('Positions')
 
 figure;
@@ -129,9 +141,9 @@ figure;
 % plot velocity estimation
 hold on;
 grid on;
-plot(data(2:end,1), X(6,:)', 'g');
-plot(data(2:end,1), X(5,:)', 'r');
-plot(data(2:end,1), X(4,:)', 'b');
+plot(data(firstIter:end,1), X(6,:)', 'g');
+plot(data(firstIter:end,1), X(5,:)', 'r');
+plot(data(firstIter:end,1), X(4,:)', 'b');
 title('Velocities')
 
 figure;
@@ -144,9 +156,9 @@ for i = 1 : length(quats(1,:))
 end
 hold on;
 grid on;
-plot(data(2:end,1), vels(1,:)', 'b');
-plot(data(2:end,1), vels(2,:)', 'r');
-plot(data(2:end,1), vels(3,:)', 'g');
+plot(data(firstIter:end,1), vels(1,:)', 'b');
+plot(data(firstIter:end,1), vels(2,:)', 'r');
+plot(data(firstIter:end,1), vels(3,:)', 'g');
 title('Local velocities')
 
 
@@ -154,10 +166,10 @@ figure;
 % plot quaternion estimation
 hold on;
 grid on;
-plot(data(2:end,1), X(7,:)', 'k');
-plot(data(2:end,1), X(8,:)', 'b');
-plot(data(2:end,1), X(9,:)', 'r');
-plot(data(2:end,1), X(10,:)', 'g');
+plot(data(firstIter:end,1), X(7,:)', 'k');
+plot(data(firstIter:end,1), X(8,:)', 'b');
+plot(data(firstIter:end,1), X(9,:)', 'r');
+plot(data(firstIter:end,1), X(10,:)', 'g');
 title('Quaternion')
 
 figure;
@@ -170,8 +182,8 @@ for i = 1 : length(quats(1,:))
 end
 hold on;
 grid on;
-plot(data(2:end,1), E(1,:)', 'b');
-plot(data(2:end,1), E(2,:)', 'r');
-plot(data(2:end,1), E(3,:)', 'g');
+plot(data(firstIter:end,1), E(1,:)', 'b');
+plot(data(firstIter:end,1), E(2,:)', 'r');
+plot(data(firstIter:end,1), E(3,:)', 'g');
 title('Euler angles')
 
