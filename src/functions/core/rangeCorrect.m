@@ -2,13 +2,26 @@ function [x,P] = rangeCorrect(x,P,y)
 %RANGECORRECT Correct state estimation with range data
 %
 
-    persistent N; N = 0.005;
+    persistent N; N = 0.1;
+    
+    p = x(1:3);
+    q = x(7:10);
+    R = q2R(q);
     
     % measurement model
-    h = x(3)/(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2);
+    h = p(3)/R(3,3); % R(3,3) = q(1)^2 - q(2)^2 - q(3)^2 + q(4)^2;
+    
+    % Jacobian of measurement model w.r.t states
+    H_p = [0, 0, 1/R(3,3)];                                 % d(h)/d(p)
+    H_v = zeros(1,3);                                       % d(h)/d(v)
+    H_q = (p(3)/R(3,3)^2).*[-2*q(1) 2*q(2) 2*q(3) 2*q(4)];  % d(h)/d(q)
 
+    H = [H_p H_v H_q];                                      % d(h)/d(x)
+    
     % Jacobian of measurement model w.r.t error states
-    H = [ 0, 0, 1/(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2), 0, 0, 0, (2*x(3)*x(7)*x(8))/(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2)^2 + (2*x(3)*x(9)*x(10))/(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2)^2, (2*x(3)*x(7)*x(9))/(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2)^2 - (2*x(3)*x(8)*x(10))/(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2)^2, 0]; 
+    X_dx = Qmat(q);
+    X_dx = blkdiag(eye(6), X_dx);
+    H = H*X_dx;                                             %d(h)/d(dx)
     
     % compute innovation and covariance
     z = y(7) - h;
