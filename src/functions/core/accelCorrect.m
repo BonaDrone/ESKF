@@ -2,32 +2,39 @@ function [x,P] = accelCorrect(x,P,y)
 %ACCELCORRECT Correct state estimation with accelerometer data
 %
 
-    persistent n; n = 1.0;
+    persistent n; n = 2.0;
     persistent N; N = [n, 0, 0; 0, n, 0; 0, 0, n];
-    persistent g; g = 9.80665;
-    
-    
-    H = [ 0 0 0 0 0 0                    0                      -x(7)*x(7)+x(8)*x(8)+x(9)*x(9)-x(10)*x(10)*-g 2*x(7)*x(8)+2*x(9)*x(10)*-g;...
-          0 0 0 0 0 0 x(7)*x(7)-x(8)*x(8)-x(9)*x(9)+x(10)*x(10)*-g                     0                      2*x(7)*x(9)-2*x(8)*x(10)*-g;...
-          0 0 0 0 0 0        -2*x(7)*x(8)-2*x(9)*x(10)*-g                  2*x(8)*x(10)-2*x(7)*x(9)*-g                        0];
-                
+    persistent gz; gz = 9.80665;
 
-    h = [ (2*x(7)*x(9) - 2*x(8)*x(10)) * -g;...
-          (-2*x(7)*x(8) - 2*x(9)*x(10)) * -g;...
-          (-x(7)*x(7) + x(8)*x(8) + x(9)*x(9) - x(10)*x(10)) * -g];
-                               
-    y_norm = y(1:3)/norm(y(1:3));  
-    h_norm = h/norm(h);  
+    g = [0; 0; -gz];
     
-%     % measurement model
-%     h = [ g*(2*x(7)*x(9) - 2*x(8)*x(10));
-%          -g*(2*x(7)*x(8) + 2*x(9)*x(10));
-%          -g*(x(7)^2 - x(8)^2 - x(9)^2 + x(10)^2)];
-%     
-%     % Jacobian of measurement model w.r.t. error states
-%     H = [ 0, 0, 0, 0, 0, 0,                                 0, - g*x(7)^2 + g*x(8)^2 + g*x(9)^2 - g*x(10)^2, 2*g*x(7)*x(8) + 2*g*x(9)*x(10);...
-%           0, 0, 0, 0, 0, 0, g*x(7)^2 - g*x(8)^2 - g*x(9)^2 + g*x(10)^2,                                   0, 2*g*x(7)*x(9) - 2*g*x(8)*x(10);...
-%           0, 0, 0, 0, 0, 0,           - 2*g*x(7)*x(8) - 2*g*x(9)*x(10),               2*g*x(8)*x(10) - 2*g*x(7)*x(9),                     0];
+    qw = x(7);
+    qx = x(8);
+    qy = x(9);
+    qz = x(10);
+    q = [qw qx qy qz];
+
+    R = q2R(q);
+
+    % measurement model
+    h = R.' * g;
+
+    % Jacobian of measurement model w.r.t. state
+    H_p = zeros(3,3);                                       % d(h)/d(p)
+    H_v = zeros(3,3);                                       % d(h)/d(v)
+    H_q = [ 2*gz*qy, -2*gz*qz,  2*gz*qw, -2*gz*qx;...       % d(h)/d(q)
+           -2*gz*qx, -2*gz*qw, -2*gz*qz, -2*gz*qy;...
+           -2*gz*qw,  2*gz*qx,  2*gz*qy, -2*gz*qz];                
+       
+    H = [H_p H_v H_q];                                      % d(h)/d(x)
+
+    % Jacobian of measurement model w.r.t error states
+    X_dx = Qmat(q);
+    X_dx = blkdiag(eye(6), X_dx);
+    H = H*X_dx;                                             %d(h)/d(dx)
+
+    y_norm = y(1:3)/norm(y(1:3));
+    h_norm = h/norm(h);
 
     % compute innovation and covariance
     z = y_norm - h_norm;
