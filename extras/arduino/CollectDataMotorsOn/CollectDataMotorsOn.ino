@@ -1,10 +1,8 @@
 /*
-   CollectData.ino : Script to collect data from the sensors present in 
-   BonaDrone's FC and used to estimate the drone's status. It currently
+   CollectDataMotorsOn.ino : Script to collect data from the sensors present in 
+   BonaDrone's FC and used to estimate the drone's state. It currently
    collects data from the IMU, the Rangefinder and the Optical Flow at the
    same time that the motors are running at 50%.
-
-   This script runs, on BonaDrone's FC, at about 172Hz.
 
    Additional libraries needed:
 
@@ -17,20 +15,19 @@
        https://github.com/BonaDrone/grumpyoldpizza
 
    Copyright (c) 2019 Juan Gallostra
- */
+*/
 
 #include "PMW3901.h"
 #include <LSM6DSM.h>
 #include <VL53L1X.h>
 
 #include <Wire.h>
-#include <FS.h>
 #include <Arduino.h>
 
 
-File datalog;
 // Using digital pin A4 for chip select
 PMW3901 flow(12, &SPI1);
+
 // Motor pins
 const uint8_t MOTOR_PINS[4] = {39, 30, 40, 31};
 
@@ -82,6 +79,7 @@ bool distanceAvailable(float & distance)
     return false;
 }
 
+// LED pins
 const uint8_t blue = 38;
 const uint8_t red = 25;
 
@@ -148,6 +146,7 @@ void setup() {
       while (true) Serial.println("Range unavailable");
     }
 
+    // init motors
     for (int k=0; k<4; ++k) 
     {
       pinMode(MOTOR_PINS[k], OUTPUT);
@@ -155,16 +154,7 @@ void setup() {
       analogWrite(MOTOR_PINS[k], 0);  
     }
 
-    DOSFS.begin();
-    datalog = DOSFS.open("datalog.csv", "w");
-
     delay(3000);
-
-    // Motors at 50% power
-    analogWrite(MOTOR_PINS[0], (uint8_t)(0.5 * 255));
-    analogWrite(MOTOR_PINS[1], (uint8_t)(0.5 * 255));
-    analogWrite(MOTOR_PINS[2], (uint8_t)(0.5 * 255));
-    analogWrite(MOTOR_PINS[3], (uint8_t)(0.5 * 255));
 
     startTime = micros();
     lastFlowTime = micros();
@@ -176,6 +166,9 @@ void setup() {
 
 // Flag that indicates if there is new data
 bool newData = false;
+
+bool motorsOff = true;
+uint32_t motorsTimer = micros();
 // IMU
 float _ax, _ay, _az, _gx, _gy, _gz;
 // Range
@@ -187,6 +180,16 @@ int16_t deltaX, deltaY;
 void loop() {
   // put your main code here, to run repeatedly:
   uint32_t currentTime = micros();
+
+  if (currentTime - motorsTimer > 5*1000000 && motorsOff)
+  {
+    // Motors at 50% power
+    analogWrite(MOTOR_PINS[0], (uint8_t)(0.5 * 255));
+    analogWrite(MOTOR_PINS[1], (uint8_t)(0.5 * 255));
+    analogWrite(MOTOR_PINS[2], (uint8_t)(0.5 * 255));
+    analogWrite(MOTOR_PINS[3], (uint8_t)(0.5 * 255));
+    motorsOff = false;
+  }
   
   if(currentTime - startTime < 60 * 1000000)
   {
@@ -257,7 +260,7 @@ void loop() {
 
   } else {
 
-    // Motors at 50% power
+    // Motors at 0% power
     analogWrite(MOTOR_PINS[0], (uint8_t)(0.0 * 255));
     analogWrite(MOTOR_PINS[1], (uint8_t)(0.0 * 255));
     analogWrite(MOTOR_PINS[2], (uint8_t)(0.0 * 255));
