@@ -2,7 +2,7 @@ function [x,P] = accelCorrect(x,P,y)
 %ACCELCORRECT Correct state estimation with accelerometer data
 %
 
-    persistent n; n = 5.0;
+    persistent n; n = 10.0;
     persistent N; N = [n, 0, 0; 0, n, 0; 0, 0, n];
     persistent gz; gz = 9.80665;
 
@@ -17,11 +17,12 @@ function [x,P] = accelCorrect(x,P,y)
     R = q2R(q);
 
     % measurement model
-%     h = R.' * g;
-    h = [ (2*x(7)*x(9) - 2*x(8)*x(10)) * -gz;...
-          (-2*x(7)*x(8) - 2*x(9)*x(10)) * -gz;...
-          (-x(7)*x(7) + x(8)*x(8) + x(9)*x(9) - x(10)*x(10)) * -gz];
-
+%     h = -R.' * g;
+%     h = [ (2*x(7)*x(9) - 2*x(8)*x(10)) * -gz;...
+%           (-2*x(7)*x(8) - 2*x(9)*x(10)) * -gz;...
+%           (-x(7)*x(7) + x(8)*x(8) + x(9)*x(9) - x(10)*x(10)) * -gz];
+      
+    h = -R'*g;
 %     % Jacobian of measurement model w.r.t. state
 %     H_p = zeros(3,3);                                       % d(h)/d(p)
 %     H_v = zeros(3,3);                                       % d(h)/d(v)
@@ -45,6 +46,7 @@ function [x,P] = accelCorrect(x,P,y)
 
     % compute innovation and covariance
     z = y_norm - h_norm;
+    % z = y - h;
     Z = H*P*H.' + N;
     % compute gain
     K = (P*H.')/Z;

@@ -4,7 +4,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_40.csv");
+   data = csvread("../data/raw_data_35.csv");
 catch
    % do nothing, just avoid throwing an error
 end
@@ -66,7 +66,7 @@ for i = 2 : length(data(:,1))
         else
             dt = timestamp - data(i-1,1);
             [x, P] = updateState(x, P, lastIMUData, dt);
-            [x, P] = accelCorrect(x, P, sensor_data);
+            % [x, P] = accelCorrect(x, P, sensor_data);
             counter = 0;
         end
         
@@ -96,7 +96,7 @@ for i = 2 : length(data(:,1))
 %         sensor_data(8) = -sensor_data(8)/dt;
 %         sensor_data(9) = sensor_data(9)/dt;
 %         [x, P] = flowCorrect(x, P, sensor_data);
-        [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
+          [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
         previousFlowTimestamp = i;
     end
     
