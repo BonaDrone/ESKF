@@ -1,4 +1,4 @@
-function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
+function [x,P] = flowCorrectCrazyflie(x,P,y,q,dt)
 %FLOWCORRECTCRAZYFLIE Correct state estimation with flow data
 %   
 
@@ -13,7 +13,7 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
       height = x(3);
   end
   
-  R = q2R([x(7), x(8), x(9), x(10)]);
+  R = q2R(q);
   
   Npix = 30.0; % [pixels] (same in x and y)
   thetapix = (pi/180) * 4.2; % [rad] (same in x and y)

@@ -1,11 +1,10 @@
-function [x,P] = rangeCorrect(x,P,y)
+function [x,P] = rangeCorrect(x,P,y,q)
 %RANGECORRECT Correct state estimation with range data
 %
 
     persistent N; N = 0.1;
     
     p = x(1:3);
-    q = x(7:10);
     R = q2R(q);
     
     % measurement model

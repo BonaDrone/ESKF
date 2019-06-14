@@ -1,22 +1,30 @@
-clc; clear
+addpath('madgwick/quaternion_library');     % include quaternion library
+clc; 
+clear;
 format long;
 
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_41.csv");
+   data = csvread("../data/raw_data_23.csv");
 catch
    % do nothing, just avoid throwing an error
 end
 
-data = data(1000:end, :);
+data = data(500:end, :);
 
 %% ESKF Simulation
+
+% init Madgwick filter to estimate the orientation
+% see: https://github.com/BonaDrone/Hackflight/blob/06fe35f618ebedb435cff61db9bef9515d851366/src/boards/softquat.hpp#L36
+b = sqrt(3.0 / 4.0) * pi * (40.0 / 180.0);
+AHRS = MadgwickAHRS('Beta', b);
+
 
 % Flow Outlier detection
 FLOW_LIMIT = 1000;
 % Initialize state and P
-x = zeros(10, 1); x(7) = 1.0; x(3) = 0.0;
+x = zeros(6, 1);
 %P = zeros(9,9);
 P = 0.5*diag(ones(1,6));
 
@@ -60,13 +68,21 @@ for i = 2 : length(data(:,1))
     if (IMUData)
         if (counter < IMU_ACCEL_RATIO)
             dt = timestamp - data(i-1,1);
-            [x, P] = updateState(x, P, sensor_data, dt);
+
+            AHRS.UpdateIMU(sensor_data(4:6), sensor_data(1:3), dt);
+            q = AHRS.Quaternion;
+
+            [x, P] = updateState(x, P, sensor_data, q, dt);
             lastIMUData = sensor_data(1:6);
             counter = counter + 1;
         else
             dt = timestamp - data(i-1,1);
-            [x, P] = updateState(x, P, lastIMUData, dt);
-            [x, P] = accelCorrect(x, P, sensor_data);
+
+            AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3), dt);
+            q = AHRS.Quaternion;
+
+            [x, P] = updateState(x, P, lastIMUData, q, dt);
+            [x, P] = accelCorrect(x, P, sensor_data, q);
             counter = 0;
         end
         
@@ -77,10 +93,14 @@ for i = 2 : length(data(:,1))
         
     else
         dt = timestamp - data(i-1,1);
-        [x, P] = updateState(x, P, lastIMUData, dt);
+
+        AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3), dt);
+        q = AHRS.Quaternion;
+
+        [x, P] = updateState(x, P, lastIMUData, q, dt);
     end
     if (rangeData)
-        [x, P] = rangeCorrect(x, P, sensor_data);
+        [x, P] = rangeCorrect(x, P, sensor_data, q);
     end
     if (flowData && abs(sensor_data(8)) < FLOW_LIMIT && abs(sensor_data(9)) < FLOW_LIMIT)
         dt = timestamp - data(previousFlowTimestamp,1);
@@ -96,11 +116,11 @@ for i = 2 : length(data(:,1))
 %         sensor_data(8) = -sensor_data(8)/dt;
 %         sensor_data(9) = sensor_data(9)/dt;
 %         [x, P] = flowCorrect(x, P, sensor_data);
-          [x, P] = flowCorrectCrazyflie(x, P, sensor_data, dt);
+          [x, P] = flowCorrectCrazyflie(x, P, sensor_data, q, dt);
         previousFlowTimestamp = i;
     end
-    
-    X = [X, x]; % Log state after estimations
+    x_c = [x; q.']; 
+    X = [X, x_c]; % Log state after estimations
 
 end
 

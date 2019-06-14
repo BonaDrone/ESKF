@@ -1,4 +1,4 @@
-function [x, P] = updateState(x, P, y, dt)
+function [x, P] = updateState(x, P, y, q, dt)
 %UPDATE state estimation and process covariance 
 %
     persistent g; g = 9.80665;
@@ -16,12 +16,12 @@ function [x, P] = updateState(x, P, y, dt)
     as = y(1:3)';
     ws = y(4:6)';
     
-    q_aux = [1; ws*dt/2];
-    q = qProd(x(7:10), q_aux);
+    %q_aux = [1; ws*dt/2];
+    %q = qProd(x(7:10), q_aux);
     v = x(4:6) + q2R(q)*(as + [0;0;-g])*dt;    
     p = x(1:3) + v*dt;
         
-    x = [p; v; q];
+    x = [p; v];% q];
     
     % Error-State Jacobian
 %     Fn =  [ 1, 0, 0, dt,  0,  0,                                                               0,                                                               0,                                                               0;...

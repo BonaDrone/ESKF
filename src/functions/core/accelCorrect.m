@@ -1,4 +1,4 @@
-function [x,P] = accelCorrect(x,P,y)
+function [x,P] = accelCorrect(x,P,y,q)
 %ACCELCORRECT Correct state estimation with accelerometer data
 %
 
@@ -7,12 +7,6 @@ function [x,P] = accelCorrect(x,P,y)
     persistent gz; gz = 9.80665;
 
     g = [0; 0; -gz];
-    
-    qw = x(7);
-    qx = x(8);
-    qy = x(9);
-    qz = x(10);
-    q = [qw qx qy qz];
 
     R = q2R(q);
 
