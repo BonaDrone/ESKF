@@ -2,7 +2,7 @@ function [x,P] = accelCorrect(x,P,y)
 %ACCELCORRECT Correct state estimation with accelerometer data
 %
 
-    persistent n; n = 10.0;
+    persistent n; n = 5.0;
     persistent N; N = [n, 0, 0; 0, n, 0; 0, 0, n];
     persistent gz; gz = 9.80665;
 
@@ -37,10 +37,12 @@ function [x,P] = accelCorrect(x,P,y)
 %     X_dx = blkdiag(eye(6), X_dx);
 %     H = H*X_dx;                                             %d(h)/d(dx)
 
-    H = [ 0 0 0 0 0 0                    0                      -x(7)*x(7)+x(8)*x(8)+x(9)*x(9)-x(10)*x(10)*-gz 2*x(7)*x(8)+2*x(9)*x(10)*-gz;...
-          0 0 0 0 0 0 x(7)*x(7)-x(8)*x(8)-x(9)*x(9)+x(10)*x(10)*-gz                    0                      2*x(7)*x(9)-2*x(8)*x(10)*-gz;...
-          0 0 0 0 0 0        -2*x(7)*x(8)-2*x(9)*x(10)*-gz                  2*x(8)*x(10)-2*x(7)*x(9)*-gz                        0];
-    
+%     H = [ 0 0 0 0 0 0                    0                      -x(7)*x(7)+x(8)*x(8)+x(9)*x(9)-x(10)*x(10)*-gz 2*x(7)*x(8)+2*x(9)*x(10)*-gz;...
+%           0 0 0 0 0 0 x(7)*x(7)-x(8)*x(8)-x(9)*x(9)+x(10)*x(10)*-gz                    0                      2*x(7)*x(9)-2*x(8)*x(10)*-gz;...
+%           0 0 0 0 0 0        -2*x(7)*x(8)-2*x(9)*x(10)*-gz                  2*x(8)*x(10)-2*x(7)*x(9)*-gz                        0];
+
+    H = zeros(3, 6);
+
     y_norm = y(1:3)/norm(y(1:3));
     h_norm = h/norm(h);
 
@@ -55,7 +57,7 @@ function [x,P] = accelCorrect(x,P,y)
     % inject errors
     x = injectErrors(x,dx);
     % update P
-    P = (eye(9) - K*H)*P*(eye(9) - K*H).' + K*N*K.';
+    P = (eye(6) - K*H)*P*(eye(6) - K*H).' + K*N*K.';
       
 end
 

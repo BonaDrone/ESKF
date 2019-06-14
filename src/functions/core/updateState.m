@@ -5,11 +5,12 @@ function [x, P] = updateState(x, P, y, dt)
     
     persistent Q; % Adjust Q
 
-    Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)), diag(ones(1,3)));
+%     Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)), diag(ones(1,3)));
+    Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)));%, diag(ones(1,3)));
 
-    Q(1,1) = 0; Q(2,2) = 0; Q(3,3) = 0;
-    Q(4,4) = 0.01; Q(5,5) = 0.01; Q(6,6) = 0.01;
-    Q(7,7) = 5.0; Q(8,8) = 5.0; Q(9,9) = 5.0;
+%     Q(1,1) = 0; Q(2,2) = 0; Q(3,3) = 0;
+%     Q(4,4) = 0.01; Q(5,5) = 0.01; Q(6,6) = 0.01;
+%     Q(7,7) = 5.0; Q(8,8) = 5.0; Q(9,9) = 5.0;
 
     % Integration model: Update state
     as = y(1:3)';
@@ -36,11 +37,16 @@ function [x, P] = updateState(x, P, y, dt)
     V  = -q2R(q)*skew(as);          % as -> measured accelerations
     Fi = -skew(ws);                 % ws -> measured angular velocities
         
-    A_dx = [zeros(3)   eye(3)   zeros(3); ...
-            zeros(3)  zeros(3)    V     ; ...
-            zeros(3)  zeros(3)    Fi   ]; 
+%     A_dx = [zeros(3)   eye(3)   zeros(3); ...
+%             zeros(3)  zeros(3)    V     ; ...
+%             zeros(3)  zeros(3)    Fi   ]; 
 
-    Fn = eye(9) + A_dx*dt;    
+%     Fn = eye(9) + A_dx*dt;    
+
+    A_dx = [zeros(3)   eye(3) ;...
+            zeros(3)  zeros(3)];
+
+    Fn = eye(6) + A_dx*dt;    
 
     % Predict covariance
     P = Fn*P*Fn.' + Q; % Q is already Fi*Q*Fi.';

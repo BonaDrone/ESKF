@@ -36,9 +36,14 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
   
   % Jacobian of measurement model with respect to the error states
   % dh/dx * dx/ddx where dx/ddx = blkdiag(I_6 Q)
-  H = [ 0 0 h_zx h_vx  0   0 0 0 0;...
-        0 0 h_zy  0   h_vy 0 0 0 0;];
+% 
+%   H = [ 0 0 h_zx h_vx  0   0 0 0 0;...
+%         0 0 h_zy  0   h_vy 0 0 0 0;];
+
+  H = [ 0 0 h_zx h_vx  0   0;...
+        0 0 h_zy  0   h_vy 0];
   
+
   % compute innovation and covariance
   z = [measuredNX - predictedNX; measuredNY - predictedNY];
   Z = H*P*H.' + N;
@@ -49,7 +54,7 @@ function [x,P] = flowCorrectCrazyflie(x,P,y,dt)
   % inject errors
   x = injectErrors(x,dx);
   % update P
-  P = (eye(9) - K*H)*P*(eye(9) - K*H).' + K*N*K.';
+  P = (eye(6) - K*H)*P*(eye(6) - K*H).' + K*N*K.';
 
 end
 

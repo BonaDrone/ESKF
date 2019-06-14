@@ -11,12 +11,12 @@ function [x] = injectErrors(x,dx)
     x(6) = x(6) + dx(6);
     
     % Inject orientation error
-    tmp = [1; dx(7)/2; dx(8)/2; dx(9)/2];
-
-    q_aux = qProd(x(7:10), tmp);
-    q_aux = q_aux/norm(q_aux);
-    
-    x(7:10) = q_aux;
+%     tmp = [1; dx(7)/2; dx(8)/2; dx(9)/2];
+% 
+%     q_aux = qProd(x(7:10), tmp);
+%     q_aux = q_aux/norm(q_aux);
+%     
+%     x(7:10) = q_aux;
 
 end
 

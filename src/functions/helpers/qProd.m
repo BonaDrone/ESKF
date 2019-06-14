@@ -39,8 +39,16 @@
 
 function [q,J_q1,J_q2] = qProd(q1,q2)
 
-[a,b,c,d] = split(q1);
-[w,x,y,z] = split(q2);
+% [a,b,c,d] = split(q1);
+a = q1(1);
+b = q1(2);
+c = q1(3);
+d = q1(4);
+% [w,x,y,z] = split(q2);
+w = q2(1);
+x = q2(2);
+y = q2(3);
+z = q2(4);
 
 q = [...
     a*w - b*x - c*y - d*z
