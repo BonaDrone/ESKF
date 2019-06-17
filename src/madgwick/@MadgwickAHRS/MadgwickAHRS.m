@@ -25,7 +25,7 @@ classdef MadgwickAHRS < handle
                 end
             end;
         end
-        function obj = Update(obj, Gyroscope, Accelerometer, Magnetometer)
+        function obj = Update(obj, Gyroscope, Accelerometer, Magnetometer, dt)
             q = obj.Quaternion; % short name local variable for readability
 
             % Normalise accelerometer measurement
@@ -60,7 +60,8 @@ classdef MadgwickAHRS < handle
             qDot = 0.5 * quaternProd(q, [0 Gyroscope(1) Gyroscope(2) Gyroscope(3)]) - obj.Beta * step';
 
             % Integrate to yield quaternion
-            q = q + qDot * obj.SamplePeriod;
+%             q = q + qDot * obj.SamplePeriod;
+            q = q + qDot * dt;
             obj.Quaternion = q / norm(q); % normalise quaternion
         end
         function obj = UpdateIMU(obj, Gyroscope, Accelerometer, dt)
