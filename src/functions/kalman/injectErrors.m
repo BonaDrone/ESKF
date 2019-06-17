@@ -9,6 +9,9 @@ function [x] = injectErrors(x,dx)
     x(4) = x(4) + dx(4); % velocity
     x(5) = x(5) + dx(5);
     x(6) = x(6) + dx(6);
+    x(7) = x(7) + dx(7); % ab
+    x(8) = x(8) + dx(8);
+    x(9) = x(9) + dx(9);
     
     % Inject orientation error
 %     tmp = [1; dx(7)/2; dx(8)/2; dx(9)/2];

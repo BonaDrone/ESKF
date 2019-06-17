@@ -6,7 +6,7 @@ function [x, P] = updateState(x, P, y, q, dt)
     persistent Q; % Adjust Q
 
 %     Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)), diag(ones(1,3)));
-    Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)));%, diag(ones(1,3)));
+    Q = blkdiag(zeros(3), 0.08*diag(ones(1,3)), 0.08*diag(ones(1,3)));%, diag(ones(1,3)));
 
 %     Q(1,1) = 0; Q(2,2) = 0; Q(3,3) = 0;
 %     Q(4,4) = 0.01; Q(5,5) = 0.01; Q(6,6) = 0.01;
@@ -14,14 +14,15 @@ function [x, P] = updateState(x, P, y, q, dt)
 
     % Integration model: Update state
     as = y(1:3)';
-    ws = y(4:6)';
+%     ws = y(4:6)';
+    ab = x(7:9);
     
     %q_aux = [1; ws*dt/2];
     %q = qProd(x(7:10), q_aux);
-    v = x(4:6) + q2R(q)*(as + [0;0;-g])*dt;    
+    v = x(4:6) + q2R(q)*(as - ab + [0;0;-g])*dt;    
     p = x(1:3) + v*dt;
         
-    x = [p; v];% q];
+    x = [p; v; ab];% q];
     
     % Error-State Jacobian
 %     Fn =  [ 1, 0, 0, dt,  0,  0,                                                               0,                                                               0,                                                               0;...
@@ -34,8 +35,9 @@ function [x, P] = updateState(x, P, y, q, dt)
 %             0, 0, 0,  0,  0,  0,                                                         -dt*y(6),                                                               1,                                                          dt*y(4);...
 %             0, 0, 0,  0,  0,  0,                                                          dt*y(5),                                                         -dt*y(4),                                                               1];
 
-    V  = -q2R(q)*skew(as);          % as -> measured accelerations
-    Fi = -skew(ws);                 % ws -> measured angular velocities
+%     V  = -q2R(q)*skew(as-ab);          % as -> measured accelerations
+%     Fi = -skew(ws);                 % ws -> measured angular velocities
+    R = q2R(q);
         
 %     A_dx = [zeros(3)   eye(3)   zeros(3); ...
 %             zeros(3)  zeros(3)    V     ; ...
@@ -43,10 +45,11 @@ function [x, P] = updateState(x, P, y, q, dt)
 
 %     Fn = eye(9) + A_dx*dt;    
 
-    A_dx = [zeros(3)   eye(3) ;...
-            zeros(3)  zeros(3)];
+    A_dx = [zeros(3)   eye(3) zeros(3);...
+            zeros(3)  zeros(3) -R     ;...
+                  zeros(3,9)          ];
 
-    Fn = eye(6) + A_dx*dt;    
+    Fn = eye(9) + A_dx*dt;    
 
     % Predict covariance
     P = Fn*P*Fn.' + Q; % Q is already Fi*Q*Fi.';

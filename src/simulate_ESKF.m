@@ -11,7 +11,7 @@ catch
    % do nothing, just avoid throwing an error
 end
 
-data = data(500:end, :);
+data = data(100:end, :);
 
 %% ESKF Simulation
 
@@ -24,9 +24,9 @@ AHRS = MadgwickAHRS('Beta', b);
 % Flow Outlier detection
 FLOW_LIMIT = 1000;
 % Initialize state and P
-x = zeros(6, 1);
+x = zeros(9, 1);
 %P = zeros(9,9);
-P = 0.5*diag(ones(1,6));
+P = 0.5*diag(ones(1,9));
 
 X = [];
 
@@ -69,7 +69,7 @@ for i = 2 : length(data(:,1))
         if (counter < IMU_ACCEL_RATIO)
             dt = timestamp - data(i-1,1);
 
-            AHRS.UpdateIMU(sensor_data(4:6), sensor_data(1:3), dt);
+            AHRS.UpdateIMU(sensor_data(4:6), sensor_data(1:3)-x(7:9)', dt);
             q = AHRS.Quaternion;
 
             [x, P] = updateState(x, P, sensor_data, q, dt);
@@ -78,11 +78,11 @@ for i = 2 : length(data(:,1))
         else
             dt = timestamp - data(i-1,1);
 
-            AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3), dt);
+            AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3)-x(7:9)', dt);
             q = AHRS.Quaternion;
 
             [x, P] = updateState(x, P, lastIMUData, q, dt);
-            [x, P] = accelCorrect(x, P, sensor_data, q);
+            %[x, P] = accelCorrect(x, P, sensor_data, q);
             counter = 0;
         end
         
@@ -94,7 +94,7 @@ for i = 2 : length(data(:,1))
     else
         dt = timestamp - data(i-1,1);
 
-        AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3), dt);
+        AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3)-x(7:9)', dt);
         q = AHRS.Quaternion;
 
         [x, P] = updateState(x, P, lastIMUData, q, dt);
@@ -168,7 +168,7 @@ title('Velocities')
 
 figure;
 % plot velocities estimation in imu frame
-quats = X(7:10,:);
+quats = X(10:13,:);
 vels = [];
 for i = 1 : length(quats(1,:))
     R = q2R(quats(:, i));
@@ -186,15 +186,25 @@ figure;
 % plot quaternion estimation
 hold on;
 grid on;
-plot(data(firstIter:end,1), X(7,:)', 'k');
-plot(data(firstIter:end,1), X(8,:)', 'b');
-plot(data(firstIter:end,1), X(9,:)', 'r');
-plot(data(firstIter:end,1), X(10,:)', 'g');
+plot(data(firstIter:end,1), X(10,:)', 'k');
+plot(data(firstIter:end,1), X(11,:)', 'b');
+plot(data(firstIter:end,1), X(12,:)', 'r');
+plot(data(firstIter:end,1), X(13,:)', 'g');
 title('Quaternion')
+
+
+figure;
+% plot accel bias
+hold on;
+grid on;
+plot(data(firstIter:end,1), X(7,:)', 'b');
+plot(data(firstIter:end,1), X(8,:)', 'r');
+plot(data(firstIter:end,1), X(9,:)', 'g');
+title('Accel bias (m/s²)')
 
 figure;
 % plot euler angles' estimation
-quats = X(7:10,:);
+quats = X(10:13,:);
 E = [];
 for i = 1 : length(quats(1,:))
     e = q2e(quats(:, i));

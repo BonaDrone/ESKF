@@ -3,7 +3,7 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_35.csv");
+   data = csvread("../data/raw_data_43.csv");
 catch
    % do nothing, just avoid throwing an error
 end
