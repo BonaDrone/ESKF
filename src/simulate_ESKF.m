@@ -6,13 +6,14 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_23.csv");
+   data = csvread("../data/raw_data_46.csv");
 catch
    % do nothing, just avoid throwing an error
 end
 
 data = data(500:end, :);
-
+% Uncoment if data has magneto readings
+data = [data(:, 1:7) data(:, 11:13)];
 %% ESKF Simulation
 
 % init Madgwick filter to estimate the orientation
@@ -205,5 +206,6 @@ grid on;
 plot(data(firstIter:end,1), E(1,:)', 'b');
 plot(data(firstIter:end,1), E(2,:)', 'r');
 plot(data(firstIter:end,1), E(3,:)', 'g');
+ylim([-0.3 0.05]);
 title('Euler angles')
 
