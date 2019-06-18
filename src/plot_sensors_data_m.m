@@ -1,0 +1,159 @@
+clc; clear
+format long;
+%% Load raw data
+% try catch structure for debugging
+try
+   data = csvread("../data/raw_data_48.csv");
+catch
+   % do nothing, just avoid throwing an error
+end
+
+data = data(1000:end, :);
+
+timestamps = data(:,1);
+
+figure;
+% Plot accels
+subplot(4,1,1);
+hold on;
+grid on;
+
+accelx = data(:,2);
+accely = data(:,3);
+accelz = data(:,4);
+
+tx = timestamps(accelx ~= 1000.0);
+ty = timestamps(accely ~= 1000.0);
+tz = timestamps(accelz ~= 1000.0);
+
+accelx = accelx(accelx ~= 1000.0);
+accely = accely(accely ~= 1000.0);
+accelz = accelz(accelz ~= 1000.0);
+
+plot(tx, accelx, 'b');
+plot(ty, accely, 'r');
+plot(tz, accelz, 'g');
+title('accelerations')  
+ylim([-0.2 1.2])
+
+subplot(4,1,2);
+hold on;
+grid on;
+plot(tx, accelx, 'b');
+title('x-axis acceleration (g)')  
+
+subplot(4,1,3);
+hold on;
+grid on;
+plot(ty, accely, 'r');
+title('y-axis acceleration (g)')
+
+subplot(4,1,4);
+hold on;
+grid on;
+plot(tz, accelz, 'g');
+title('z-axis acceleration (g)')
+
+% Plot sampling intervals
+figure;
+hold on;
+plot(1./(tx(2:end)-tx(1:end-1)), 'b');
+plot(1./(ty(2:end)-ty(1:end-1)), 'r');
+plot(1./(tz(2:end)-tz(1:end-1)), 'g');
+title('accel sampling frquency')
+
+figure;
+% Plot angular velocities
+hold on;
+grid on;
+gyrox = data(:,5);
+gyroy = data(:,6);
+gyroz = data(:,7);
+
+tx = timestamps(gyrox ~= 1000.0);
+ty = timestamps(gyroy ~= 1000.0);
+tz = timestamps(gyroz ~= 1000.0);
+
+gyrox = gyrox(gyrox ~= 1000.0) * pi/180;
+gyroy = gyroy(gyroy ~= 1000.0) * pi/180;
+gyroz = gyroz(gyroz ~= 1000.0) * pi/180;
+
+plot(tx, gyrox, 'b');
+plot(ty, gyroy, 'r');
+plot(tz, gyroz, 'g');
+title('angular velocities (rad/s)')
+
+figure;
+% Plot magneto values
+hold on;
+grid on;
+mx = data(:,8);
+my = data(:,9);
+mz = data(:,10);
+
+tx = timestamps(mx ~= 1000.0);
+ty = timestamps(my ~= 1000.0);
+tz = timestamps(mz ~= 1000.0);
+
+mx = mx(mx ~= 1000.0);
+my = my(my ~= 1000.0);
+mz = mz(mz ~= 1000.0);
+
+plot(tx, mx*1000, 'b');
+plot(ty, my*1000, 'r');
+plot(tz, mz*1000, 'g');
+title('Magnetic field (mG')
+
+% Plot sampling intervals
+figure;
+hold on;
+plot(1./(tx(2:end)-tx(1:end-1)), 'b');
+plot(1./(ty(2:end)-ty(1:end-1)), 'r');
+plot(1./(tz(2:end)-tz(1:end-1)), 'g');
+ylim([0 300])
+title('IMU sampling frequency')
+
+
+figure;
+% Plot range height
+hold on;
+grid on;
+range = data(:,11);
+
+tr = timestamps(range ~= 1000.0);
+
+range = range(range ~= 1000.0);
+
+plot(tr, range, 'b');
+title('height (m)')
+
+% Plot sampling intervals
+figure;
+plot(1./(tr(2:end)-tr(1:end-1)), 'b');
+ylim([0 100])
+title('range sampling frequency')
+
+figure;
+% Plot flows
+hold on;
+grid on;
+flowx = data(:,12);
+flowy = data(:,13);
+
+tx = timestamps(flowx ~= 1000.0);
+ty = timestamps(flowy ~= 1000.0);
+
+flowx = flowx(flowx ~= 1000.0);
+flowy = flowy(flowy ~= 1000.0);
+
+plot(tx, flowx, 'b');
+plot(ty, flowy, 'r');
+title('flows (accumulated pixels)')
+
+% Plot sampling intervals
+figure;
+hold on;
+plot(1./(tx(2:end)-tx(1:end-1)), 'b');
+plot(1./(ty(2:end)-ty(1:end-1)), 'r');
+ylim([0 50])
+title('flow sampling frequency')
