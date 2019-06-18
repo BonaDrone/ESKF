@@ -34,9 +34,10 @@ PMW3901 flow(12, &SPI1);
 const uint8_t MOTOR_PINS[4] = {39, 30, 40, 31};
 
 // Magnetometer setup
-// Will be computed on the calibratio of the sensor
-static float MAGNETO_BIAS[3]  = {0.0, 0.0, 0.0};
-static float MAGNETO_SCALE[3] = {0.0, 0.0, 0.0}; 
+// These were computed previously by Kris.  
+// We use them here to avoid having to calibrate.
+static float MAGNETO_BIAS[3]  = {0.814, -0.093, -0.579};
+static float MAGNETO_SCALE[3] = {1.11, 1.02, 0.90};
 
 // Specify sensor parameters (sample rate is twice the bandwidth)
 // choices are: ODR_10Hz, MOIDR_20Hz, ODR_50 Hz and ODR_100Hz
@@ -180,7 +181,7 @@ void setup() {
 
     delay(100);
     lis2mdl.clearInterrupt();
-    lis2mdl.calibrate(MAGNETO_BIAS, MAGNETO_SCALE);
+    // lis2mdl.calibrate(MAGNETO_BIAS, MAGNETO_SCALE);
 
     if (!flow.begin()) {
       while(1) { Serial.println("Initialization of the flow sensor failed"); }
