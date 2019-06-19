@@ -104,6 +104,7 @@ bool distanceAvailable(float & distance)
 // LED pins
 const uint8_t blue = 38;
 const uint8_t red = 25;
+const uint8_t green = 26;
 
 // Collection freqs
 int FLOW_FREQ = 25; // Hz
@@ -121,12 +122,16 @@ uint32_t lastIMUTime;
 uint32_t lastRangeTime;
 uint32_t lastMagnetoTime;
 
+uint32_t motorsTimer;
+
 void setup() {
   
     pinMode(blue, OUTPUT);
     digitalWrite(blue, 1);
     pinMode(red, OUTPUT);
     digitalWrite(red, 1);
+    pinMode(green, OUTPUT);
+    digitalWrite(green, 1);
     
     Serial.begin(115200);
 
@@ -206,17 +211,15 @@ void setup() {
     startTime = micros();
     lastFlowTime = micros();
     lastIMUTime = micros();
-    lastMagnetoTime = micros();
-
-    digitalWrite(blue, 0);
-
+    lastMagnetoTime = micros(); 
+    motorsTimer = micros();
+    digitalWrite(green, 0);   
 }
 
 // Flag that indicates if there is new data
 bool newData = false;
 
 bool motorsOff = true;
-uint32_t motorsTimer = micros();
 // IMU
 float _ax, _ay, _az, _gx, _gy, _gz;
 // Range
@@ -238,11 +241,12 @@ void loop() {
     analogWrite(MOTOR_PINS[2], (uint8_t)(0.5 * 255));
     analogWrite(MOTOR_PINS[3], (uint8_t)(0.5 * 255));
     motorsOff = false;
+    digitalWrite(green, 1);
+    digitalWrite(blue, 0);
   }
   
-  if(currentTime - startTime < 180 * 1000000)
+  if(currentTime - startTime < 70 * 1000000)
   {
-    
     // Read sensor data
     bool imuData = false;
     _ax = 1000.0; // 1000 is an unlikely value to be read from any of the sensors, so it is used to indicate no data
