@@ -1,9 +1,10 @@
-function [x,P] = flowCorrectCrazyflie(x,P,y,q,dt)
+function [x,P] = flowCorrectCrazyflieM(x,P,y,q,dt)
 %FLOWCORRECTCRAZYFLIE Correct state estimation with flow data
 %   
 
+%   persistent n; n = 0.0625;
   persistent n; n = 0.0625;
-%   persistent n; n = 5.0;
+%   persistent n; n = 1.0;
   persistent N; N = [n, 0; 0, n];
 
   % Saturate elevation in prediction and correction to avoid singularities

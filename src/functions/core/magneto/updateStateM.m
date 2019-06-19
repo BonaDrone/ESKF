@@ -1,4 +1,4 @@
-function [x, P] = updateState(x, P, y, q, dt)
+function [x, P] = updateStateM(x, P, y, q, dt)
 %UPDATE state estimation and process covariance 
 %
     persistent g; g = 9.80665;

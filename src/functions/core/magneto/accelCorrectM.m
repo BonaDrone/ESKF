@@ -1,4 +1,4 @@
-function [x,P] = accelCorrect(x,P,y,q)
+function [x,P] = accelCorrectM(x,P,y,q)
 %ACCELCORRECT Correct state estimation with accelerometer data
 %
 
