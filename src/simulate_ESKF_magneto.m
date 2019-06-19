@@ -6,19 +6,19 @@ format long;
 %% Load raw data
 % try catch structure for debugging
 try
-   data = csvread("../data/raw_data_46.csv");
+   data = csvread("../data/raw_data_59.csv");
 catch
    % do nothing, just avoid throwing an error
 end
 
-data = data(500:end, :);
+% data = data(500:end, :);
 
 %% ESKF Simulation
 
 % init Madgwick filter to estimate the orientation
 % see: https://github.com/BonaDrone/Hackflight/blob/06fe35f618ebedb435cff61db9bef9515d851366/src/boards/softquat.hpp#L36
-% b = sqrt(3.0 / 4.0) * pi * (40.0 / 180.0);
-b = 0.01;
+%b = sqrt(3.0 / 4.0) * pi * (40.0 / 180.0); % roughly 0.6
+b = 0.5;
 AHRS = MadgwickAHRS('Beta', b);
 
 
@@ -70,6 +70,7 @@ for i = 2 : length(data(:,1))
         if (counter < IMU_ACCEL_RATIO)
             dt = timestamp - data(i-1,1);
 
+%             AHRS.UpdateIMU(sensor_data(4:6), sensor_data(1:3), dt);
             AHRS.Update(sensor_data(4:6), sensor_data(1:3), sensor_data(7:9), dt);
             q = AHRS.Quaternion;
 
@@ -79,6 +80,7 @@ for i = 2 : length(data(:,1))
         else
             dt = timestamp - data(i-1,1);
 
+%             AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3), dt);
             AHRS.Update(lastIMUData(4:6), lastIMUData(1:3), lastIMUData(7:9), dt);
             q = AHRS.Quaternion;
 
@@ -95,6 +97,7 @@ for i = 2 : length(data(:,1))
     else
         dt = timestamp - data(i-1,1);
 
+%         AHRS.UpdateIMU(lastIMUData(4:6), lastIMUData(1:3), dt);        
         AHRS.Update(lastIMUData(4:6), lastIMUData(1:3), lastIMUData(7:9), dt);
         q = AHRS.Quaternion;
 
